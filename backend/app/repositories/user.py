@@ -1,0 +1,25 @@
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.models.user import User, TokenBlacklist
+from app.repositories.base import BaseRepository
+
+
+class UserRepository(BaseRepository[User]):
+    def __init__(self, db: AsyncSession):
+        super().__init__(User, db)
+
+    async def get_by_email(self, email: str) -> User | None:
+        result = await self.db.execute(select(User).where(User.email == email))
+        return result.scalar_one_or_none()
+
+    async def blacklist_token(self, token: str) -> None:
+        blacklisted = TokenBlacklist(token=token)
+        self.db.add(blacklisted)
+        await self.db.commit()
+
+    async def is_token_blacklisted(self, token: str) -> bool:
+        result = await self.db.execute(
+            select(TokenBlacklist).where(TokenBlacklist.token == token)
+        )
+        return result.scalar_one_or_none() is not None

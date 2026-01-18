@@ -1,0 +1,9 @@
+from app.routers.auth import router as auth_router
+from app.routers.users import router as users_router
+from app.routers.categories import router as categories_router
+from app.routers.books import router as books_router
+from app.routers.cart import router as cart_router
+from app.routers.orders import router as orders_router
+from app.routers.payments import router as payments_router
+from app.routers.reviews import router as reviews_router
+from app.routers.admin import router as admin_router
