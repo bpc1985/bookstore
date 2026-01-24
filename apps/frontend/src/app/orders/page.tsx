@@ -73,7 +73,7 @@ export default function OrdersPage() {
             <Skeleton key={i} className="h-32 w-full" />
           ))}
         </div>
-      ) : !orders || orders.items.length === 0 ? (
+       ) : !orders || !orders.items || orders.items.length === 0 ? (
         <div className="text-center py-12">
           <Package className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
           <h2 className="text-xl font-semibold mb-2">No orders yet</h2>

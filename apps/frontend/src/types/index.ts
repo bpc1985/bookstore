@@ -66,6 +66,7 @@ export interface OrderItem {
   price_at_purchase: string;
   book_title: string | null;
   book_author: string | null;
+  book_cover_image: string | null;
   book?: BookListItem;
 }
 

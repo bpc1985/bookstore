@@ -184,6 +184,13 @@ class ApiClient {
     });
   }
 
+  async completeOrder(orderId: number): Promise<{ order_id: number; status: string; message: string }> {
+    return this.request('/payments/checkout', {
+      method: 'POST',
+      body: JSON.stringify({ order_id: orderId }),
+    });
+  }
+
   async getOrders(params?: {
     status?: string;
     page?: number;

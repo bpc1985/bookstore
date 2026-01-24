@@ -141,43 +141,39 @@ export default function OrderDetailPage() {
               <CardTitle>Order Items</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {order.items.map((item) => (
-                <div key={item.id} className="flex gap-4">
-                  <div className="w-20 h-28 bg-muted rounded-md flex items-center justify-center shrink-0">
-                    {item.book?.cover_image ? (
-                      <img
-                        src={item.book.cover_image}
-                        alt={item.book?.title || 'Book'}
-                        className="w-full h-full object-cover rounded-md"
-                      />
-                    ) : (
-                      <BookOpen className="h-6 w-6 text-muted-foreground" />
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    {item.book ? (
-                      <Link href={`/books/${item.book.id}`}>
-                        <h3 className="font-semibold hover:text-primary transition-colors">
-                          {item.book.title}
-                        </h3>
-                      </Link>
-                    ) : (
-                      <h3 className="font-semibold">Book (no longer available)</h3>
-                    )}
-                    {item.book && <p className="text-sm text-muted-foreground">{item.book.author}</p>}
-                    <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold">${item.price_at_purchase}</p>
-                    <p className="text-sm text-muted-foreground">each</p>
-                  </div>
-                </div>
-              ))}
+               {order.items.map((item) => (
+                 <div key={item.id} className="flex gap-4">
+                   {item.book_cover_image ? (
+                     <div className="w-20 h-28 bg-muted rounded-md flex items-center justify-center shrink-0 overflow-hidden">
+                       <img
+                         src={item.book_cover_image}
+                         alt={item.book_title || 'Book'}
+                         className="w-full h-full object-cover"
+                       />
+                     </div>
+                   ) : (
+                     <div className="w-20 h-28 bg-muted rounded-md flex items-center justify-center shrink-0">
+                       <BookOpen className="h-6 w-6 text-muted-foreground" />
+                     </div>
+                   )}
+                   <div className="flex-1">
+                     <h3 className="font-semibold">
+                       {item.book_title || 'Book (no longer available)'}
+                     </h3>
+                     {item.book_author && <p className="text-sm text-muted-foreground">{item.book_author}</p>}
+                     <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+                   </div>
+                   <div className="text-right">
+                     <p className="font-bold">${item.price_at_purchase}</p>
+                     <p className="text-sm text-muted-foreground">each</p>
+                   </div>
+                 </div>
+               ))}
             </CardContent>
           </Card>
 
           {/* Order Timeline */}
-          {tracking && tracking.status_history.length > 0 && (
+          {tracking && tracking.status_history && tracking.status_history.length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle>Order Timeline</CardTitle>

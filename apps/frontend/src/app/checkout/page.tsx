@@ -1,14 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, CreditCard, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
@@ -16,39 +15,13 @@ import { useAuthStore } from '@/stores/auth';
 import { useCartStore } from '@/stores/cart';
 import { api } from '@/lib/api';
 import { toast } from 'sonner';
-import StripePayment from '@/components/payment/StripePayment';
-
-interface PayPalButtonProps {
-  approvalUrl: string;
-  onApprove: () => void;
-}
-
-function PayPalButton({ approvalUrl, onApprove }: PayPalButtonProps) {
-  const handlePayPalClick = () => {
-    window.open(approvalUrl, '_blank');
-    onApprove();
-  };
-
-  return (
-    <Button
-      type="button"
-      className="w-full bg-[#003087] hover:bg-[#001c4e]"
-      size="lg"
-      onClick={handlePayPalClick}
-    >
-      <CreditCard className="h-4 w-4 mr-2" />
-      Pay with PayPal
-    </Button>
-  );
-}
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { user, isInitialized } = useAuthStore();
   const { cart, isLoading: cartLoading, fetchCart, clearCart } = useCartStore();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentProvider, setPaymentProvider] = useState<'stripe' | 'paypal'>('stripe');
+  const [orderId, setOrderId] = useState<number | null>(null);
   const [shippingAddress, setShippingAddress] = useState({
     fullName: '',
     address: '',
@@ -57,13 +30,6 @@ export default function CheckoutPage() {
     zipCode: '',
     country: 'United States',
   });
-  const [orderId, setOrderId] = useState<number | null>(null);
-  const [paymentId, setPaymentId] = useState<number | null>(null);
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [approvalUrl, setApprovalUrl] = useState<string | null>(null);
-
-  const payerId = searchParams.get('PayerID');
-  const paymentIdParam = searchParams.get('paymentId');
 
   useEffect(() => {
     if (isInitialized && !user) {
@@ -81,61 +47,35 @@ export default function CheckoutPage() {
     }
   }, [user, fetchCart]);
 
-  useEffect(() => {
-    if (payerId && paymentIdParam && orderId) {
-      handlePayPalReturn(payerId, paymentIdParam);
-    }
-  }, [payerId, paymentIdParam, orderId]);
-
   const formatAddress = () => {
     return `${shippingAddress.fullName}\n${shippingAddress.address}\n${shippingAddress.city}, ${shippingAddress.state} ${shippingAddress.zipCode}\n${shippingAddress.country}`;
   };
 
-  const initiateCheckout = async () => {
+  const handleCompleteOrder = async () => {
     if (!cart || cart.items.length === 0) {
       toast.error('Your cart is empty');
       return;
     }
 
+    console.log('Creating order...');
+    const address = formatAddress();
+    console.log('Shipping address:', address);
+
     setIsProcessing(true);
     try {
-      const order = await api.createOrder(formatAddress());
+      const order = await api.createOrder(address);
+      console.log('Order created:', order);
       setOrderId(order.id);
 
-      const payment = await api.initiatePayment(order.id, paymentProvider);
+      console.log('Completing order:', order.id);
+      const result = await api.completeOrder(order.id);
+      console.log('Order completion result:', result);
 
-      setPaymentId(payment.payment_id);
-
-      if (payment.client_secret) {
-        setClientSecret(payment.client_secret);
-      } else if (payment.approval_url) {
-        setApprovalUrl(payment.approval_url);
-      } else if (payment.status === 'completed') {
-        await handlePaymentSuccess(order.id);
-      } else {
-        toast.info('Payment is being processed...');
-      }
+      await clearCart();
+      toast.success('Order completed successfully!');
+      router.push(`/order-confirmation/${order.id}`);
     } catch (error) {
-      toast.error((error as Error).message);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const handlePaymentSuccess = async (orderId: number) => {
-    await clearCart();
-    toast.success('Payment successful! Order placed.');
-    router.push(`/order-confirmation/${orderId}`);
-  };
-
-  const handlePayPalReturn = async (payerId: string, paypalPaymentId: string) => {
-    setIsProcessing(true);
-    try {
-      if (paymentId) {
-        await api.confirmPayPalPayment(paymentId, payerId);
-        await handlePaymentSuccess(orderId!);
-      }
-    } catch (error) {
+      console.error('Error completing order:', error);
       toast.error((error as Error).message);
     } finally {
       setIsProcessing(false);
@@ -176,7 +116,7 @@ export default function CheckoutPage() {
       <h1 className="text-3xl font-bold mb-8">Checkout</h1>
 
       <div className="grid lg:grid-cols-2 gap-8">
-        {/* Shipping & Payment */}
+        {/* Shipping & Complete Order */}
         <div className="space-y-6">
           {/* Shipping Address */}
           <Card>
@@ -192,7 +132,7 @@ export default function CheckoutPage() {
                   value={shippingAddress.fullName}
                   onChange={(e) => setShippingAddress({ ...shippingAddress, fullName: e.target.value })}
                   required
-                  disabled={!!orderId}
+                  disabled={isProcessing}
                 />
               </div>
               <div className="space-y-2">
@@ -203,7 +143,7 @@ export default function CheckoutPage() {
                   value={shippingAddress.address}
                   onChange={(e) => setShippingAddress({ ...shippingAddress, address: e.target.value })}
                   required
-                  disabled={!!orderId}
+                  disabled={isProcessing}
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -214,7 +154,7 @@ export default function CheckoutPage() {
                     value={shippingAddress.city}
                     onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
                     required
-                    disabled={!!orderId}
+                    disabled={isProcessing}
                   />
                 </div>
                 <div className="space-y-2">
@@ -224,7 +164,7 @@ export default function CheckoutPage() {
                     value={shippingAddress.state}
                     onChange={(e) => setShippingAddress({ ...shippingAddress, state: e.target.value })}
                     required
-                    disabled={!!orderId}
+                    disabled={isProcessing}
                   />
                 </div>
               </div>
@@ -236,7 +176,7 @@ export default function CheckoutPage() {
                     value={shippingAddress.zipCode}
                     onChange={(e) => setShippingAddress({ ...shippingAddress, zipCode: e.target.value })}
                     required
-                    disabled={!!orderId}
+                    disabled={isProcessing}
                   />
                 </div>
                 <div className="space-y-2">
@@ -245,99 +185,27 @@ export default function CheckoutPage() {
                 </div>
               </div>
             </CardContent>
+            <CardFooter>
+              <Button
+                onClick={handleCompleteOrder}
+                className="w-full"
+                size="lg"
+                disabled={isProcessing || cartLoading}
+              >
+                {isProcessing ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="h-4 w-4 mr-2" />
+                    Complete Order
+                  </>
+                )}
+              </Button>
+            </CardFooter>
           </Card>
-
-          {/* Payment Method */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Payment Method</CardTitle>
-              <CardDescription>Select your preferred payment method</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {!orderId ? (
-                <RadioGroup
-                  value={paymentProvider}
-                  onValueChange={(value) => setPaymentProvider(value as 'stripe' | 'paypal')}
-                >
-                  <div className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-muted/50">
-                    <RadioGroupItem value="stripe" id="stripe" />
-                    <Label htmlFor="stripe" className="flex-1 cursor-pointer">
-                      <div className="font-medium">Credit Card (Stripe)</div>
-                      <div className="text-sm text-muted-foreground">Pay with Visa, Mastercard, or American Express</div>
-                    </Label>
-                    <CreditCard className="h-6 w-6 text-muted-foreground" />
-                  </div>
-                  <div className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-muted/50 mt-3">
-                    <RadioGroupItem value="paypal" id="paypal" />
-                    <Label htmlFor="paypal" className="flex-1 cursor-pointer">
-                      <div className="font-medium">PayPal</div>
-                      <div className="text-sm text-muted-foreground">Pay with your PayPal account</div>
-                    </Label>
-                    <div className="text-blue-600 font-bold text-sm">PayPal</div>
-                  </div>
-                </RadioGroup>
-              ) : (
-                <div className="text-sm text-muted-foreground">
-                  Payment method: <span className="font-medium">{paymentProvider === 'stripe' ? 'Credit Card' : 'PayPal'}</span>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Payment Form */}
-          {clientSecret && paymentProvider === 'stripe' && (
-            <StripePayment
-              clientSecret={clientSecret}
-              onPaymentSuccess={handlePaymentSuccess}
-              onPaymentError={(error) => toast.error(error.message)}
-              amount={cart?.subtotal ? parseFloat(cart.subtotal) : undefined}
-            />
-          )}
-
-          {approvalUrl && paymentProvider === 'paypal' && (
-            <Card>
-              <CardContent className="pt-6">
-                <div className="space-y-4">
-                  <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
-                    <CheckCircle2 className="h-5 w-5 text-blue-600 mt-0.5" />
-                    <div className="flex-1">
-                      <h3 className="font-medium mb-1">Complete your payment</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Click the button below to open PayPal and complete your payment. After paying, you will be redirected back to confirm your order.
-                      </p>
-                    </div>
-                  </div>
-                  <PayPalButton
-                    approvalUrl={approvalUrl}
-                    onApprove={() => {
-                      toast.info('Please complete the payment in the opened PayPal window');
-                    }}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {!orderId && !clientSecret && !approvalUrl && (
-            <Button
-              onClick={initiateCheckout}
-              className="w-full"
-              size="lg"
-              disabled={isProcessing || cartLoading}
-            >
-              {isProcessing ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Processing...
-                </>
-              ) : (
-                <>
-                  <CreditCard className="h-4 w-4 mr-2" />
-                  Continue to Payment
-                </>
-              )}
-            </Button>
-          )}
         </div>
 
         {/* Order Summary */}

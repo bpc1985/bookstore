@@ -61,6 +61,7 @@ async def get_order(
             "price_at_purchase": item.price_at_purchase,
             "book_title": item.book.title if item.book else None,
             "book_author": item.book.author if item.book else None,
+            "book_cover_image": item.book.cover_image if item.book else None,
         })
 
     return {

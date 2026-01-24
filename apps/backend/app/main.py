@@ -2,10 +2,14 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+import logging
 
 from app.database import create_tables
 from app.routers import auth_router, users_router, categories_router, books_router, cart_router, orders_router, payments_router, reviews_router, admin_router
 from app.exceptions import BookStoreException
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
@@ -28,6 +32,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    logger.info(f"Request: {request.method} {request.url.path}")
+    response = await call_next(request)
+    logger.info(f"Response: {response.status_code} for {request.method} {request.url.path}")
+    return response
 
 
 @app.exception_handler(BookStoreException)
