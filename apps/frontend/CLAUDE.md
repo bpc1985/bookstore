@@ -4,20 +4,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is the **frontend** of a full-stack bookstore e-commerce application. The backend (FastAPI) is located at `/Users/hungho/Code/bookstore/backend`.
+This is the **frontend** of a full-stack bookstore e-commerce application. The backend (FastAPI) is located at `apps/backend/` in the monorepo root.
 
 ## Commands
 
+From the monorepo root:
 ```bash
-# Development
-npm run dev          # Start dev server at http://localhost:3000
+pnpm frontend:dev            # Start dev server at http://localhost:3000
+pnpm frontend:build          # Build for production
+```
 
-# Build & Production
-npm run build        # Build for production
-npm start            # Run production build
-
-# Linting
-npm run lint         # Run ESLint
+From this directory:
+```bash
+pnpm dev                     # Start dev server at http://localhost:3000
+pnpm build                   # Build for production
+pnpm start                   # Run production build
+pnpm lint                    # Run ESLint
+pnpm clean                   # Remove .next and node_modules
 ```
 
 ## Architecture
@@ -76,8 +79,8 @@ All API calls go through `lib/api.ts` which provides:
 The frontend connects to FastAPI backend at `NEXT_PUBLIC_API_URL` (default: `http://localhost:8000`).
 
 **Test Accounts:**
-- Admin: `admin@bookstore.com` / `admin123`
-- User: `john@example.com` / `password123`
+- Admin: `admin@bookstore.com` / `admin123456`
+- User: `user@bookstore.com` / `user123456`
 
 ## Adding shadcn/ui Components
 

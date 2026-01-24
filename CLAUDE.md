@@ -4,51 +4,83 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Full-stack e-commerce bookstore application with separate frontend and backend directories.
+Full-stack e-commerce bookstore application using **Turborepo** monorepo with pnpm workspaces.
 
-- **Frontend**: `frontend/` - Next.js 16 with shadcn/ui and Zustand
-- **Backend**: `backend/` - FastAPI with async SQLAlchemy
+- **Frontend**: `apps/frontend/` - Next.js 16 with shadcn/ui and Zustand
+- **Backend**: `apps/backend/` - FastAPI with async SQLAlchemy
 
-Each directory has its own `CLAUDE.md` with detailed guidance for that part of the stack.
+Each app has its own `CLAUDE.md` with detailed guidance for that part of the stack.
 
 ## Quick Start
 
-### Backend
+### Install Dependencies
 ```bash
-cd backend
-pip install -r requirements.txt
-python seeds/seed_data.py                    # Seed sample data
-uvicorn app.main:app --reload --port 8000    # http://localhost:8000
+pnpm install
 ```
 
-### Frontend
+### Run Both Apps (Development)
 ```bash
-cd frontend
-npm install
-npm run dev                                  # http://localhost:3000
+pnpm dev                     # Starts both frontend and backend
+```
+
+### Run Individual Apps
+```bash
+pnpm frontend:dev            # http://localhost:3000
+pnpm backend:dev             # http://localhost:8000 (requires venv activated)
+```
+
+### Backend Setup (Python)
+```bash
+cd apps/backend
+python -m venv venv
+source venv/bin/activate     # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+cd ../..
+pnpm backend:seed            # Seed sample data
+pnpm backend:migrate         # Run migrations
 ```
 
 **Test credentials:**
 - Admin: `admin@bookstore.com` / `admin123456`
 - User: `user@bookstore.com` / `user123456`
 
+## Monorepo Commands
+
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Start all apps in development mode |
+| `pnpm build` | Build all apps |
+| `pnpm lint` | Lint all apps |
+| `pnpm clean` | Clean all build artifacts and node_modules |
+| `pnpm frontend:dev` | Start frontend only |
+| `pnpm frontend:build` | Build frontend only |
+| `pnpm backend:dev` | Start backend only (requires venv) |
+| `pnpm backend:seed` | Seed backend database |
+| `pnpm backend:migrate` | Run backend migrations |
+
 ## Architecture Overview
 
 ```
 bookstore/
-├── frontend/          # Next.js App Router
-│   ├── src/app/       # Pages (/, /books, /cart, /checkout, /orders, /admin)
-│   ├── src/components/# React components (ui/, layout/, feature-specific)
-│   ├── src/stores/    # Zustand stores (auth.ts, cart.ts)
-│   └── src/lib/api.ts # Centralized API client
+├── apps/
+│   ├── frontend/          # Next.js App Router
+│   │   ├── src/app/       # Pages (/, /books, /cart, /checkout, /orders, /admin)
+│   │   ├── src/components/# React components (ui/, layout/, feature-specific)
+│   │   ├── src/stores/    # Zustand stores (auth.ts, cart.ts)
+│   │   └── src/lib/api.ts # Centralized API client
+│   │
+│   └── backend/           # FastAPI
+│       └── app/
+│           ├── routers/   # API endpoints
+│           ├── services/  # Business logic
+│           ├── repositories/ # Data access layer
+│           ├── models/    # SQLAlchemy ORM
+│           └── schemas/   # Pydantic validation
 │
-└── backend/           # FastAPI
-    └── app/
-        ├── routers/   # API endpoints
-        ├── services/  # Business logic
-        ├── repositories/ # Data access layer
-        ├── models/    # SQLAlchemy ORM
-        └── schemas/   # Pydantic validation
+├── packages/              # Shared packages (for future use)
+├── package.json           # Root workspace config
+├── pnpm-workspace.yaml    # pnpm workspace definition
+└── turbo.json             # Turborepo configuration
 ```
 
 ### Data Flow
@@ -65,10 +97,10 @@ bookstore/
 
 ## Database
 
-SQLite file at `backend/bookstore.db`. Migrations via Alembic:
+SQLite file at `apps/backend/bookstore.db`. Migrations via Alembic:
 
 ```bash
-cd backend
+cd apps/backend
 alembic upgrade head              # Apply migrations
 alembic revision --autogenerate -m "description"  # Create migration
 ```

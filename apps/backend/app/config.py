@@ -9,6 +9,17 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 15
     refresh_token_expire_days: int = 7
 
+    stripe_secret_key: str = ""
+    stripe_publishable_key: str = ""
+    stripe_webhook_secret: str = ""
+    paypal_client_id: str = ""
+    paypal_client_secret: str = ""
+    paypal_mode: str = "sandbox"
+    paypal_webhook_id: str = ""
+
+    payment_retry_max_attempts: int = 3
+    payment_retry_delay_seconds: int = 2
+
     class Config:
         env_file = ".env"
 

@@ -4,12 +4,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Commands
 
+From the monorepo root (requires venv activated):
+```bash
+pnpm backend:dev             # Start dev server at http://localhost:8000
+pnpm backend:seed            # Seed database with sample data
+pnpm backend:migrate         # Run migrations
+```
+
+From this directory:
 ```bash
 # Install dependencies
 pip install -r requirements.txt
 
 # Run development server
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+# Or via pnpm
+pnpm dev                     # Same as uvicorn command above
 
 # Database migrations
 alembic upgrade head                              # Apply all migrations
@@ -18,6 +29,8 @@ alembic revision --autogenerate -m "message"      # Create new migration
 
 # Seed database with sample data
 python seeds/seed_data.py
+# Or via pnpm
+pnpm seed
 ```
 
 **Test credentials (from seed data):**

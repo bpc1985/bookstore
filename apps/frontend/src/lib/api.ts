@@ -217,6 +217,8 @@ class ApiClient {
   async initiatePayment(orderId: number, provider: 'stripe' | 'paypal'): Promise<{
     payment_id: number;
     status: string;
+    client_secret?: string;
+    approval_url?: string;
     redirect_url: string | null;
     message: string;
   }> {
@@ -231,12 +233,53 @@ class ApiClient {
     });
   }
 
-  async confirmPayment(paymentId: number): Promise<{
+  async confirmStripePayment(paymentId: number, paymentMethodId: string): Promise<{
     payment_id: number;
     status: string;
     message: string;
   }> {
-    return this.request(`/payments/${paymentId}/confirm`, { method: 'POST' });
+    return this.request(`/payments/stripe/${paymentId}/confirm`, {
+      method: 'POST',
+      body: JSON.stringify({ payment_method_id: paymentMethodId }),
+    });
+  }
+
+  async confirmPayPalPayment(paymentId: number, payerId: string): Promise<{
+    payment_id: number;
+    status: string;
+    message: string;
+  }> {
+    return this.request(`/payments/paypal/${paymentId}/confirm`, {
+      method: 'POST',
+      body: JSON.stringify({ payer_id: payerId }),
+    });
+  }
+
+  async getPayment(paymentId: number): Promise<{
+    id: number;
+    order_id: number;
+    provider: string;
+    amount: number;
+    status: string;
+    idempotency_key: string;
+    provider_reference: string | null;
+    created_at: string;
+    updated_at: string;
+  }> {
+    return this.request(`/payments/${paymentId}`);
+  }
+
+  async refundPayment(paymentId: number, amount?: number, reason?: string): Promise<{
+    payment_id: number;
+    status: string;
+    refund_id: string | null;
+    amount_refunded: number | null;
+    message: string;
+  }> {
+    return this.request(`/payments/${paymentId}/refund`, {
+      method: 'POST',
+      body: JSON.stringify({ amount, reason }),
+    });
   }
 
   // Reviews

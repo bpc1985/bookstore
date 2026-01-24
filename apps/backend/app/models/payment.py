@@ -15,6 +15,7 @@ class PaymentProvider(str, PyEnum):
 class PaymentStatus(str, PyEnum):
     PENDING = "pending"
     PROCESSING = "processing"
+    REQUIRES_ACTION = "requires_action"
     COMPLETED = "completed"
     FAILED = "failed"
     REFUNDED = "refunded"
