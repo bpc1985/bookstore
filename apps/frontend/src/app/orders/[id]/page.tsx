@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowLeft, BookOpen, Package, Clock, CheckCircle, XCircle, Truck, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -143,19 +144,19 @@ export default function OrderDetailPage() {
             <CardContent className="space-y-4">
                {order.items.map((item) => (
                  <div key={item.id} className="flex gap-4">
-                   {item.book_cover_image ? (
-                     <div className="w-20 h-28 bg-muted rounded-md flex items-center justify-center shrink-0 overflow-hidden">
-                       <img
-                         src={item.book_cover_image}
-                         alt={item.book_title || 'Book'}
-                         className="w-full h-full object-cover"
-                       />
-                     </div>
-                   ) : (
-                     <div className="w-20 h-28 bg-muted rounded-md flex items-center justify-center shrink-0">
-                       <BookOpen className="h-6 w-6 text-muted-foreground" />
-                     </div>
-                   )}
+                   <div className="w-20 h-28 bg-muted rounded-md flex items-center justify-center shrink-0 overflow-hidden relative">
+                    {item.book_cover_image ? (
+                      <Image
+                        src={item.book_cover_image}
+                        alt={item.book_title || 'Book'}
+                        fill
+                        sizes="80px"
+                        className="object-cover"
+                      />
+                    ) : (
+                      <BookOpen className="h-6 w-6 text-muted-foreground" />
+                    )}
+                  </div>
                    <div className="flex-1">
                      <h3 className="font-semibold">
                        {item.book_title || 'Book (no longer available)'}

@@ -1,20 +1,28 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { ShoppingCart, User, LogOut, Settings, Package, BookOpen, Menu, Search } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  ShoppingCart,
+  LogOut,
+  Settings,
+  Package,
+  BookOpen,
+  Menu,
+  Search,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Badge } from '@/components/ui/badge';
-import { useAuthStore } from '@/stores/auth';
-import { useCartStore } from '@/stores/cart';
+} from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
+import { useAuthStore } from "@/stores/auth";
+import { useCartStore } from "@/stores/cart";
 
 export function Header() {
   const router = useRouter();
@@ -23,7 +31,7 @@ export function Header() {
 
   const handleLogout = async () => {
     await logout();
-    router.push('/');
+    router.push("/");
   };
 
   const cartItemCount = cart?.total_items || 0;
@@ -34,7 +42,11 @@ export function Header() {
         <div className="flex items-center gap-6">
           <Sheet>
             <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon" className="hover:bg-primary/10">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hover:bg-primary/10"
+              >
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
@@ -66,7 +78,7 @@ export function Header() {
                     My Orders
                   </Link>
                 )}
-                {user?.role === 'admin' && (
+                {user?.role === "admin" && (
                   <Link
                     href="/admin"
                     className="px-4 py-2.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
@@ -82,7 +94,9 @@ export function Header() {
             <div className="p-1.5 bg-primary rounded-lg group-hover:bg-primary/90 transition-colors">
               <BookOpen className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="font-bold text-xl hidden sm:inline">BookStore</span>
+            <span className="font-bold text-xl hidden sm:inline">
+              BookStore
+            </span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">
@@ -92,7 +106,7 @@ export function Header() {
             >
               Browse
             </Link>
-            {user?.role === 'admin' && (
+            {user?.role === "admin" && (
               <Link
                 href="/admin"
                 className="px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
@@ -112,11 +126,15 @@ export function Header() {
 
           {user && (
             <Link href="/cart">
-              <Button variant="ghost" size="icon" className="relative hover:bg-primary/10">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative hover:bg-primary/10"
+              >
                 <ShoppingCart className="h-5 w-5" />
                 {cartItemCount > 0 && (
                   <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs bg-primary">
-                    {cartItemCount > 9 ? '9+' : cartItemCount}
+                    {cartItemCount > 9 ? "9+" : cartItemCount}
                   </Badge>
                 )}
               </Button>
@@ -126,7 +144,11 @@ export function Header() {
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="hover:bg-primary/10">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="hover:bg-primary/10"
+                >
                   <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                     <span className="text-sm font-semibold text-primary">
                       {user.full_name.charAt(0).toUpperCase()}
@@ -165,12 +187,18 @@ export function Header() {
           ) : (
             <div className="flex items-center gap-2">
               <Link href="/login">
-                <Button variant="ghost" size="sm" className="hidden sm:inline-flex">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="hidden sm:inline-flex"
+                >
                   Log in
                 </Button>
               </Link>
               <Link href="/register">
-                <Button size="sm" className="shadow-sm">Sign up</Button>
+                <Button size="sm" className="shadow-sm">
+                  Sign up
+                </Button>
               </Link>
             </div>
           )}

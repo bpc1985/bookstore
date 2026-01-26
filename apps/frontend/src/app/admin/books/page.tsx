@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { BookOpen, Plus, Pencil, Trash2, Search, Check, X } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -130,12 +131,14 @@ export default function AdminBooksPage() {
                     <tr key={book.id} className="border-b last:border-0 hover:bg-muted/50">
                       <td className="p-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-16 bg-muted rounded flex items-center justify-center shrink-0">
+                          <div className="w-12 h-16 bg-muted rounded flex items-center justify-center shrink-0 relative overflow-hidden">
                             {book.cover_image ? (
-                              <img
+                              <Image
                                 src={book.cover_image}
                                 alt={book.title}
-                                className="w-full h-full object-cover rounded"
+                                fill
+                                sizes="48px"
+                                className="object-cover rounded"
                               />
                             ) : (
                               <BookOpen className="h-5 w-5 text-muted-foreground" />

@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { BookOpen, Minus, Plus, ShoppingCart, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -102,12 +103,14 @@ export default function CartPage() {
               <Card key={item.id}>
                 <CardContent className="p-4">
                   <div className="flex gap-4">
-                    <div className="w-24 h-32 bg-muted rounded-md flex items-center justify-center shrink-0">
+                    <div className="w-24 h-32 bg-muted rounded-md flex items-center justify-center shrink-0 relative overflow-hidden">
                       {item.book.cover_image ? (
-                        <img
+                        <Image
                           src={item.book.cover_image}
                           alt={item.book.title}
-                          className="w-full h-full object-cover rounded-md"
+                          fill
+                          sizes="96px"
+                          className="object-cover rounded-md"
                         />
                       ) : (
                         <BookOpen className="h-8 w-8 text-muted-foreground" />

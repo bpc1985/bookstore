@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { BookOpen, Minus, Plus, ShoppingCart, Star, Check, ArrowLeft, Share2, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -176,11 +177,16 @@ export default function BookDetailPage() {
             <div className="sticky top-24">
               <div className="relative max-w-md mx-auto md:mx-0">
                 <div className="absolute -inset-4 bg-gradient-to-br from-primary/10 to-accent/10 rounded-3xl blur-2xl" />
-                <img
-                  src={coverImage}
-                  alt={book.title}
-                  className="relative aspect-[2/3] w-full object-cover rounded-2xl shadow-2xl"
-                />
+                <div className="relative aspect-[2/3] w-full">
+                  <Image
+                    src={coverImage}
+                    alt={book.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 400px"
+                    className="object-cover rounded-2xl shadow-2xl"
+                    priority
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -388,10 +394,12 @@ export default function BookDetailPage() {
                       <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer border-0 bg-card shadow-sm">
                         <CardContent className="p-0">
                           <div className="aspect-[2/3] relative overflow-hidden">
-                            <img
+                            <Image
                               src={recCover}
                               alt={rec.title}
-                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                              fill
+                              sizes="(max-width: 768px) 50vw, 20vw"
+                              className="object-cover transition-transform duration-500 group-hover:scale-105"
                             />
                           </div>
                           <div className="p-3">
