@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/sonner';
 import { useAuthStore } from '@/stores/auth';
 import { useCartStore } from '@/stores/cart';
+import { api } from '@/lib/api';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,12 +21,12 @@ function AuthInitializer({ children }: { children: React.ReactNode }) {
   const { fetchCart } = useCartStore();
 
   useEffect(() => {
-    initialize();
+    initialize(api);
   }, [initialize]);
 
   useEffect(() => {
     if (isInitialized && user) {
-      fetchCart();
+      fetchCart(api);
     }
   }, [isInitialized, user, fetchCart]);
 

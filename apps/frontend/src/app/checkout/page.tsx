@@ -39,7 +39,7 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (user) {
-      fetchCart();
+      fetchCart(api);
       setShippingAddress((prev) => ({
         ...prev,
         fullName: user.full_name,
@@ -67,11 +67,7 @@ export default function CheckoutPage() {
       console.log('Order created:', order);
       setOrderId(order.id);
 
-      console.log('Completing order:', order.id);
-      const result = await api.completeOrder(order.id);
-      console.log('Order completion result:', result);
-
-      await clearCart();
+      await clearCart(api);
       toast.success('Order completed successfully!');
       router.push(`/order-confirmation/${order.id}`);
     } catch (error) {

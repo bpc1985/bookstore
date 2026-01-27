@@ -91,7 +91,7 @@ export default function BookDetailPage() {
       return;
     }
     try {
-      await addItem(bookId, quantity);
+      await addItem(api, bookId, quantity);
       toast.success('Added to cart!');
     } catch (error) {
       toast.error((error as Error).message);

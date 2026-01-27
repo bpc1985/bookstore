@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuthStore } from '@/stores/auth';
+import { api } from '@/lib/api';
 import { toast } from 'sonner';
 import AuthGuard from '@/components/middleware/AuthGuard';
 
@@ -21,7 +22,7 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await login(email, password);
+      await login(api, email, password);
       toast.success('Welcome back!');
       router.push('/');
     } catch (error) {

@@ -23,6 +23,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { useAuthStore } from "@/stores/auth";
 import { useCartStore } from "@/stores/cart";
+import { api } from "@/lib/api";
 
 export function Header() {
   const router = useRouter();
@@ -30,7 +31,7 @@ export function Header() {
   const { cart } = useCartStore();
 
   const handleLogout = async () => {
-    await logout();
+    await logout(api);
     router.push("/");
   };
 

@@ -11,6 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuthStore } from '@/stores/auth';
 import { useCartStore } from '@/stores/cart';
+import { api } from '@/lib/api';
 import { toast } from 'sonner';
 
 export default function CartPage() {
@@ -26,13 +27,13 @@ export default function CartPage() {
 
   useEffect(() => {
     if (user) {
-      fetchCart();
+      fetchCart(api);
     }
   }, [user, fetchCart]);
 
   const handleUpdateQuantity = async (itemId: number, newQuantity: number) => {
     try {
-      await updateItem(itemId, newQuantity);
+      await updateItem(api, itemId, newQuantity);
     } catch (error) {
       toast.error((error as Error).message);
     }
@@ -40,7 +41,7 @@ export default function CartPage() {
 
   const handleRemoveItem = async (itemId: number) => {
     try {
-      await removeItem(itemId);
+      await removeItem(api, itemId);
       toast.success('Item removed');
     } catch (error) {
       toast.error((error as Error).message);
@@ -49,7 +50,7 @@ export default function CartPage() {
 
   const handleClearCart = async () => {
     try {
-      await clearCart();
+      await clearCart(api);
       toast.success('Cart cleared');
     } catch (error) {
       toast.error((error as Error).message);

@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuthStore } from '@/stores/auth';
+import { api } from '@/lib/api';
 import { toast } from 'sonner';
 import AuthGuard from '@/components/middleware/AuthGuard';
 
@@ -34,7 +35,7 @@ export default function RegisterPage() {
     }
 
     try {
-      await register(email, password, fullName);
+      await register(api, email, password, fullName);
       toast.success('Account created successfully!');
       router.push('/');
     } catch (error) {
