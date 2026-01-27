@@ -13,6 +13,8 @@
     "backend:migrate": "turbo run migrate --filter=@bookstore/backend",
     "frontend:dev": "turbo run dev --filter=@bookstore/frontend",
     "frontend:build": "turbo run build --filter=@bookstore/frontend",
+    "frontend-vue:dev": "turbo run dev --filter=@bookstore/frontend-vue",
+    "frontend-vue:build": "turbo run build --filter=@bookstore/frontend-vue",
     "clean": "turbo run clean && rm -rf node_modules"
   },
   "devDependencies": {
