@@ -40,7 +40,7 @@
                 />
                 <div class="flex-1">
                   <div class="flex justify-between mb-2">
-                    <RouterLink :to="`/books/${item.book.id}`" class="font-semibold hover:text-primary">
+                    <RouterLink :to="'/books/' + item.book.id" class="font-semibold hover:text-primary">
                       {{ item.book.title }}
                     </RouterLink>
                     <Button variant="ghost" size="icon" @click="handleRemoveItem(item.id)">
@@ -48,7 +48,7 @@
                     </Button>
                   </div>
                   <p class="text-sm text-muted-foreground mb-2">{{ item.book.author }}</p>
-                  <p class="font-semibold mb-3">${item.book.price}</p>
+                  <p class="font-semibold mb-3">${{ item.book.price }}</p>
                   <div class="flex items-center gap-2">
                     <Button variant="outline" size="icon" class="h-8 w-8" @click="updateQuantity(item.id, item.quantity - 1)">
                       <Minus class="h-3 w-3" />
@@ -60,7 +60,7 @@
                   </div>
                 </div>
                 <div class="text-right">
-                  <p class="font-bold text-lg">${(parseFloat(item.book.price) * item.quantity).toFixed(2)}</p>
+                  <p class="font-bold text-lg">${{ (parseFloat(item.book.price) * item.quantity).toFixed(2) }}</p>
                 </div>
               </div>
             </CardContent>
@@ -75,7 +75,7 @@
             <CardContent class="space-y-4">
               <div class="flex justify-between">
                 <span class="text-muted-foreground">Subtotal ({{ cart.total_items }} items)</span>
-                <span class="font-semibold">${cart.subtotal}</span>
+                <span class="font-semibold">${{ cart.subtotal }}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-muted-foreground">Shipping</span>
@@ -84,7 +84,7 @@
               <Separator />
               <div class="flex justify-between text-lg">
                 <span class="font-bold">Total</span>
-                <span class="font-bold text-primary">${cart.subtotal}</span>
+                <span class="font-bold text-primary">${{ cart.subtotal }}</span>
               </div>
               <Button class="w-full" size="lg" @click="router.push('/checkout')">
                 Proceed to Checkout

@@ -1,44 +1,23 @@
 <script setup lang="ts">
-import type { HTMLAttributes } from 'vue'
-import { cn } from '@/lib/utils'
-import { useVModel } from '@vueuse/core'
+import type { HTMLAttributes } from "vue";
+import { cn } from "@/lib/utils";
 
 const props = defineProps<{
-  class?: HTMLAttributes['class']
-  defaultValue?: string
-  modelValue?: string
-  placeholder?: string
-  disabled?: boolean
-  id?: string
-  name?: string
-  required?: boolean
-  type?: string
-}>()
-
-const emits = defineEmits<{
-  (e: 'update:modelValue', payload: string): void
-}>()
-
-const modelValue = useVModel(props, 'modelValue', emits, {
-  passive: true,
-  defaultValue: props.defaultValue,
-})
+  class?: HTMLAttributes["class"];
+  for?: string;
+}>();
 </script>
 
 <template>
-  <input
-    :id="id"
-    :name="name"
-    :type="type"
-    :required="required"
-    :disabled="disabled"
-    :placeholder="placeholder"
+  <label
+    :for="props.for"
     :class="
       cn(
-        'flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
-        props.class
+        'flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50',
+        props.class,
       )
     "
-    v-model="modelValue"
-  />
+  >
+    <slot />
+  </label>
 </template>

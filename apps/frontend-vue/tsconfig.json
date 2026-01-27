@@ -18,8 +18,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@bookstore/types": ["../../packages/types/src"],
-      "@bookstore/api": ["../../packages/api/src"]
+      "@bookstore/types": ["../../packages/types/src"]
     },
     "types": ["vite/client", "node"]
   },

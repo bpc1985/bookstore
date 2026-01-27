@@ -14,7 +14,7 @@ export default defineConfig({
         'pinia',
         '@vueuse/core',
         {
-          '@bookstore/api': ['api'],
+          '@/lib/api': ['api'],
         },
       ],
       dts: 'src/auto-imports.d.ts',
@@ -34,24 +34,12 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
       '@bookstore/types': fileURLToPath(new URL('../../packages/types/src', import.meta.url)),
-      '@bookstore/api': fileURLToPath(new URL('../../packages/api/src', import.meta.url)),
     },
   },
   server: {
     port: 3001,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-      },
-    },
   },
   css: {
     postcss: './postcss.config.js',
-  },
-  optimizeDeps: {
-    exclude: [
-      '@bookstore/api',
-    ],
   },
 })

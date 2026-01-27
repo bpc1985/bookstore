@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import type { User, Token } from '@bookstore/types'
-import type { ApiClient } from '@bookstore/api'
-import { api } from '@/composables/useApi'
+import type { ApiClient } from '@/lib/api'
+import { api } from '@/lib/api'
 
 interface AuthState {
   user: User | null

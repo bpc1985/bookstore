@@ -17,13 +17,20 @@
         ← Back
       </Button>
 
-      <div class="grid md:grid-cols-2 gap-8">
-        <div class="aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl">
-          <img
-            :src="book.cover_image || 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=600&fit=crop'"
-            :alt="book.title"
-            class="w-full h-full object-cover"
-          />
+      <div class="grid md:grid-cols-2 gap-8 lg:gap-12">
+        <div class="relative">
+          <div class="sticky top-24">
+            <div class="relative max-w-md mx-auto md:mx-0">
+              <div class="absolute -inset-4 bg-gradient-to-br from-primary/10 to-accent/10 rounded-3xl blur-2xl" />
+              <div class="relative aspect-[2/3] w-full">
+                <img
+                  :src="book.cover_image || 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=600&h=900&fit=crop'"
+                  :alt="book.title"
+                  class="w-full h-full object-cover rounded-2xl shadow-2xl"
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="space-y-6">

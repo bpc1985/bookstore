@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import type { Cart, CartItem } from '@bookstore/types'
-import type { ApiClient } from '@bookstore/api'
-import { api } from '@/composables/useApi'
+import type { ApiClient } from '@/lib/api'
+import { api } from '@/lib/api'
 
 interface CartState {
   cart: Cart | null
