@@ -19,7 +19,10 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@bookstore/types": ["../../packages/types/src"],
+      "@bookstore/api": ["../../packages/api/src"],
+      "@bookstore/stores": ["../../packages/stores/src"]
     }
   },
   "include": [

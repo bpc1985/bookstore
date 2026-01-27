@@ -21,7 +21,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuthStore } from "@/stores/auth";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
-import type { OrderListItem } from "@/types";
+import type { OrderListItem } from "@bookstore/types";
 import AuthGuard from "@/components/middleware/AuthGuard";
 
 export default function ProfilePage() {

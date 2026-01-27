@@ -1,0 +1,14 @@
+{
+  "name": "@bookstore/types",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "lint": "tsc --noEmit",
+    "clean": "rm -rf node_modules dist"
+  }
+}

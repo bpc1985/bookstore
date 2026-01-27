@@ -18,9 +18,9 @@ Each app has its own `CLAUDE.md` with detailed guidance for that part of the sta
 pnpm install
 ```
 
-### Run Both Apps (Development)
+### Run All Apps (Development)
 ```bash
-pnpm dev                     # Starts both frontend and backend
+pnpm dev                     # Starts all apps
 ```
 
 ### Run Individual Apps
@@ -67,7 +67,7 @@ bookstore/
 │   │   ├── src/app/       # Pages (/, /books, /cart, /checkout, /orders, /admin)
 │   │   ├── src/components/# React components (ui/, layout/, feature-specific)
 │   │   ├── src/stores/    # Zustand stores (auth.ts, cart.ts)
-│   │   └── src/lib/api.ts # Centralized API client
+│   │   └── src/lib/api.ts # API client configuration
 │   │
 │   └── backend/           # FastAPI
 │       └── app/
@@ -77,7 +77,10 @@ bookstore/
 │           ├── models/    # SQLAlchemy ORM
 │           └── schemas/   # Pydantic validation
 │
-├── packages/              # Shared packages (for future use)
+├── packages/              # Shared packages
+│   ├── types/            # TypeScript type definitions
+│   ├── api/              # API client
+│   └── stores/           # Zustand stores (auth, cart)
 ├── package.json           # Root workspace config
 ├── pnpm-workspace.yaml    # pnpm workspace definition
 └── turbo.json             # Turborepo configuration
@@ -85,9 +88,17 @@ bookstore/
 
 ### Data Flow
 1. Frontend components use Zustand stores for state
-2. Stores and components call methods on `lib/api.ts`
+2. Stores and components call methods on API client from `@bookstore/api`
 3. API client makes HTTP requests to FastAPI backend
 4. Backend routers validate input → services handle logic → repositories access SQLite DB
+
+### Shared Packages
+
+The `packages/` directory contains shared code:
+
+- **@bookstore/types**: TypeScript type definitions (User, Book, Cart, Order, etc.)
+- **@bookstore/api**: HTTP API client
+- **@bookstore/stores**: Zustand state management stores (auth, cart)
 
 ### Key Integration Points
 

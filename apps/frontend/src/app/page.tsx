@@ -21,7 +21,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { api } from "@/lib/api";
-import type { BookListItem, Category } from "@/types";
+import type { BookListItem, Category } from "@bookstore/types";
 import { useAuthStore } from "@/stores/auth";
 
 const BOOK_COVERS = [
