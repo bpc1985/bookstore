@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Bookstore Frontend (Next.js)
+
+Next.js 16 frontend for the Bookstore e-commerce application.
+
+## Tech Stack
+
+- **Framework**: Next.js 16 with App Router
+- **UI Components**: [shadcn/ui](https://ui.shadcn.com/) (New York style) with Radix UI
+- **Styling**: Tailwind CSS 4
+- **State Management**: Zustand with persist middleware
+- **Data Fetching**: TanStack React Query
+- **Icons**: Lucide React
+- **Notifications**: Sonner
 
 ## Getting Started
 
-First, run the development server:
+### From Monorepo Root
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm frontend:dev      # Start dev server
+pnpm frontend:build    # Build for production
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### From This Directory
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm dev               # Start dev server at http://localhost:3000
+pnpm build             # Build for production
+pnpm start             # Run production build
+pnpm lint              # Run ESLint
+pnpm typecheck         # Run TypeScript type checking
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project Structure
 
-## Learn More
+```
+src/
+├── app/                    # Next.js App Router pages
+│   ├── page.tsx            # Home page
+│   ├── books/              # Book listing and details
+│   ├── cart/               # Shopping cart
+│   ├── checkout/           # Checkout flow
+│   ├── orders/             # Order history
+│   ├── profile/            # User profile
+│   ├── login/              # Authentication
+│   └── admin/              # Admin dashboard
+├── components/
+│   ├── ui/                 # shadcn/ui components
+│   └── layout/             # Header, Footer, Providers
+├── lib/
+│   ├── api.ts              # API client class
+│   └── utils.ts            # Utility functions (cn)
+├── stores/
+│   ├── auth.ts             # Authentication state
+│   └── cart.ts             # Shopping cart state
+└── types/                  # TypeScript interfaces
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Features
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Book browsing** with search, category filters, and pagination
+- **Shopping cart** with quantity management and stock validation
+- **User authentication** with JWT (auto token refresh)
+- **Order management** with status tracking
+- **Book reviews** with verified purchase badges
+- **Admin panel** for inventory, orders, and reviews
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Environment Variables
 
-## Deploy on Vercel
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `NEXT_PUBLIC_API_URL` | `http://localhost:8000` | Backend API base URL |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Adding shadcn/ui Components
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npx shadcn@latest add <component-name>
+```
+
+Configuration is in `components.json` (New York style, Lucide icons, CSS variables).
+
+## Test Accounts
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | `admin@bookstore.com` | `admin123456` |
+| User | `user@bookstore.com` | `user123456` |

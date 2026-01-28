@@ -8,9 +8,12 @@ Full-stack e-commerce bookstore application using **Turborepo** monorepo with pn
 
 - **Frontend (Next.js)**: `apps/frontend/` - Next.js 16 with shadcn/ui and Zustand — http://localhost:3000
 - **Frontend (Vue)**: `apps/frontend-vue/` - Vue 3 with shadcn-vue and Pinia — http://localhost:3001
-- **Backend**: `apps/backend/` - FastAPI with async SQLAlchemy — http://localhost:8000
+- **Backend (FastAPI)**: `apps/backend/` - FastAPI with async SQLAlchemy — http://localhost:8000
+- **Backend (NestJS)**: `apps/backend-nestjs/` - NestJS with Prisma ORM — http://localhost:8001
 
 Each app has its own `CLAUDE.md` with detailed guidance for that part of the stack.
+
+**Note:** The two backends are functionally equivalent (same 33+ endpoints, same database schema). Use FastAPI (port 8000) or NestJS (port 8001) based on preference.
 
 ## Quick Start
 
@@ -58,9 +61,12 @@ pnpm backend:migrate         # Run migrations
 | `pnpm frontend:build` | Build Next.js frontend only |
 | `pnpm frontend-vue:dev` | Start Vue frontend only |
 | `pnpm frontend-vue:build` | Build Vue frontend only |
-| `pnpm backend:dev` | Start backend only (requires venv) |
-| `pnpm backend:seed` | Seed backend database |
-| `pnpm backend:migrate` | Run backend migrations |
+| `pnpm backend:dev` | Start FastAPI backend (requires venv) |
+| `pnpm backend:seed` | Seed FastAPI database |
+| `pnpm backend:migrate` | Run FastAPI migrations |
+| `pnpm backend-nestjs:dev` | Start NestJS backend |
+| `pnpm backend-nestjs:seed` | Seed NestJS database |
+| `pnpm backend-nestjs:migrate` | Run NestJS Prisma migrations |
 
 ## Architecture Overview
 
@@ -80,13 +86,19 @@ bookstore/
 │   │   ├── src/lib/api.ts   # API client (separate from Next.js)
 │   │   └── src/router/      # Vue Router with auth guards
 │   │
-│   └── backend/             # FastAPI
-│       └── app/
-│           ├── routers/     # API endpoints
-│           ├── services/    # Business logic
-│           ├── repositories/# Data access layer
-│           ├── models/      # SQLAlchemy ORM
-│           └── schemas/     # Pydantic validation
+│   ├── backend/             # FastAPI (Python)
+│   │   └── app/
+│   │       ├── routers/     # API endpoints
+│   │       ├── services/    # Business logic
+│   │       ├── repositories/# Data access layer
+│   │       ├── models/      # SQLAlchemy ORM
+│   │       └── schemas/     # Pydantic validation
+│   │
+│   └── backend-nestjs/      # NestJS (TypeScript)
+│       ├── prisma/          # Prisma schema and migrations
+│       └── src/
+│           ├── common/      # Guards, decorators, filters
+│           └── [feature]/   # auth, users, books, cart, orders, etc.
 │
 ├── packages/                # Shared packages
 │   ├── types/               # @bookstore/types — TypeScript type definitions
@@ -100,12 +112,12 @@ bookstore/
 ### Data Flow
 1. Frontend components use stores for state (Zustand in Next.js, Pinia in Vue)
 2. Stores call methods on their respective API client
-3. API client makes HTTP requests to FastAPI backend
-4. Backend routers validate input → services handle logic → repositories access SQLite DB
+3. API client makes HTTP requests to backend (FastAPI on 8000 or NestJS on 8001)
+4. Backend validates input → services handle logic → ORM accesses SQLite DB
 
 ### Two Frontends — Key Differences
 
-Both frontends connect to the same FastAPI backend and should have matching UI/behavior.
+Both frontends can connect to either backend and should have matching UI/behavior.
 
 | Aspect | Next.js (`apps/frontend/`) | Vue (`apps/frontend-vue/`) |
 |--------|---------------------------|---------------------------|
@@ -139,10 +151,21 @@ Routes use meta properties for protection:
 
 ## Database
 
-SQLite file at `apps/backend/bookstore.db`. Migrations via Alembic:
+Each backend has its own SQLite database:
+- FastAPI: `apps/backend/bookstore.db` (Alembic migrations)
+- NestJS: `apps/backend-nestjs/prisma/bookstore.db` (Prisma migrations)
 
+**FastAPI migrations:**
 ```bash
 cd apps/backend
 alembic upgrade head              # Apply migrations
 alembic revision --autogenerate -m "description"  # Create migration
+```
+
+**NestJS migrations:**
+```bash
+cd apps/backend-nestjs
+npx prisma db push                # Apply schema to database
+npx prisma migrate dev            # Create and apply migration
+npx prisma studio                 # Open database GUI
 ```
