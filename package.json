@@ -15,7 +15,11 @@
     "frontend:build": "turbo run build --filter=@bookstore/frontend",
     "frontend-vue:dev": "turbo run dev --filter=@bookstore/frontend-vue",
     "frontend-vue:build": "turbo run build --filter=@bookstore/frontend-vue",
-    "clean": "turbo run clean && rm -rf node_modules"
+    "backend-nestjs:dev": "turbo run dev --filter=@bookstore/backend-nestjs",
+    "backend-nestjs:seed": "turbo run seed --filter=@bookstore/backend-nestjs",
+    "backend-nestjs:migrate": "turbo run migrate --filter=@bookstore/backend-nestjs",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
     "turbo": "^2.7.6"

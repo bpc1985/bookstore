@@ -6,11 +6,24 @@
       "persistent": true
     },
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "dist/**"
+      ]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": [
+        "^lint"
+      ]
+    },
+    "typecheck": {
+      "dependsOn": [
+        "^build"
+      ]
     },
     "start": {
       "cache": false,
@@ -30,8 +43,12 @@
       "persistent": true
     },
     "frontend-vue:build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist/**"
+      ]
     }
   }
 }
