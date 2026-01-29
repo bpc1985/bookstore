@@ -13,6 +13,8 @@
     "backend:migrate": "turbo run migrate --filter=@bookstore/backend",
     "frontend:dev": "turbo run dev --filter=@bookstore/frontend",
     "frontend:build": "turbo run build --filter=@bookstore/frontend",
+    "frontend-nuxt:dev": "turbo run dev --filter=@bookstore/frontend-nuxt",
+    "frontend-nuxt:build": "turbo run build --filter=@bookstore/frontend-nuxt",
     "frontend-vue:dev": "turbo run dev --filter=@bookstore/frontend-vue",
     "frontend-vue:build": "turbo run build --filter=@bookstore/frontend-vue",
     "backend-nestjs:dev": "turbo run dev --filter=@bookstore/backend-nestjs",
