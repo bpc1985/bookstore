@@ -2,6 +2,22 @@
 
 Full-stack e-commerce bookstore application using **Turborepo** monorepo with pnpm workspaces.
 
+## Live Demo
+
+| Service | URL |
+|---------|-----|
+| **Frontend** | https://bookstore-web-5al8.onrender.com |
+| **Backend API** | https://bookstore-api-i12k.onrender.com |
+| **API Docs** | https://bookstore-api-i12k.onrender.com/docs |
+
+> **Note**: Free tier services may take 30-60 seconds to wake up on first request.
+
+**Test Credentials:**
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | `admin@bookstore.com` | `admin123456` |
+| User | `user@bookstore.com` | `user123456` |
+
 ## Features
 
 - 📚 Browse and search books by category, price, and keywords
@@ -95,17 +111,11 @@ pnpm backend-nestjs:dev      # Start server
 
 Both backends are **functionally equivalent** with the same 33+ API endpoints.
 
-## Test Credentials
-
-| Role | Email | Password |
-|------|-------|----------|
-| Admin | `admin@bookstore.com` | `admin123456` |
-| User | `user@bookstore.com` | `user123456` |
-
 ## API Documentation
 
-- **FastAPI**: http://localhost:8000/docs (Swagger UI)
-- **NestJS**: http://localhost:8001/docs (Swagger UI)
+- **Live Demo**: https://bookstore-api-i12k.onrender.com/docs
+- **FastAPI (local)**: http://localhost:8000/docs (Swagger UI)
+- **NestJS (local)**: http://localhost:8001/docs (Swagger UI)
 
 ## Monorepo Commands
 
@@ -179,6 +189,30 @@ Each backend maintains its own SQLite database:
 |---------|--------------|------------|
 | FastAPI | `apps/backend/bookstore.db` | Alembic |
 | NestJS | `apps/backend-nestjs/prisma/bookstore.db` | Prisma |
+
+## Deployment
+
+The project includes Docker and Render configurations for deployment:
+
+- **Dockerfiles**: `apps/backend/Dockerfile`, `apps/frontend/Dockerfile`
+- **Render Blueprint**: `render.yaml` (auto-deploys backend, frontend, and PostgreSQL)
+
+### Deploy to Render
+
+1. Push your code to GitHub
+2. Go to [Render Dashboard](https://render.com) → **New** → **Blueprint**
+3. Connect your repository (Render auto-detects `render.yaml`)
+4. After deploy, set `NEXT_PUBLIC_API_URL` in the frontend service environment
+
+### Environment Variables (Production)
+
+| Service | Variable | Description |
+|---------|----------|-------------|
+| Backend | `DATABASE_URL` | PostgreSQL connection string |
+| Backend | `SECRET_KEY` | JWT signing key |
+| Backend | `RUN_MIGRATIONS` | Set to `true` for auto-migrations |
+| Backend | `AUTO_SEED` | Set to `true` for auto-seeding |
+| Frontend | `NEXT_PUBLIC_API_URL` | Backend API URL |
 
 ## License
 

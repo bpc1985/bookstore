@@ -2,6 +2,12 @@
 
 Next.js 16 frontend for the Bookstore e-commerce application.
 
+## Live Demo
+
+https://bookstore-web-5al8.onrender.com
+
+> **Note**: Free tier may take 30-60 seconds to wake up on first request.
+
 ## Tech Stack
 
 - **Framework**: Next.js 16 with App Router
@@ -85,3 +91,25 @@ Configuration is in `components.json` (New York style, Lucide icons, CSS variabl
 |------|-------|----------|
 | Admin | `admin@bookstore.com` | `admin123456` |
 | User | `user@bookstore.com` | `user123456` |
+
+## Deployment
+
+### Docker
+
+```bash
+# Build from monorepo root (required for workspace dependencies)
+docker build -f apps/frontend/Dockerfile -t bookstore-frontend \
+  --build-arg NEXT_PUBLIC_API_URL=https://your-api.com .
+
+# Run container
+docker run -p 3000:3000 bookstore-frontend
+```
+
+### Render
+
+The app is configured to deploy via the monorepo's `render.yaml` blueprint.
+
+**Environment Variables:**
+| Variable | Description |
+|----------|-------------|
+| `NEXT_PUBLIC_API_URL` | Backend API URL (set at build time) |

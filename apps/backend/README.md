@@ -2,6 +2,14 @@
 
 FastAPI backend for the Bookstore e-commerce application.
 
+## Live Demo
+
+- **API**: https://bookstore-api-i12k.onrender.com
+- **Swagger Docs**: https://bookstore-api-i12k.onrender.com/docs
+- **ReDoc**: https://bookstore-api-i12k.onrender.com/redoc
+
+> **Note**: Free tier may take 30-60 seconds to wake up on first request.
+
 ## Tech Stack
 
 - **Framework**: FastAPI
@@ -83,9 +91,9 @@ alembic/                # Database migrations
 
 ## API Documentation
 
-When the server is running:
-- **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
+- **Live Demo**: https://bookstore-api-i12k.onrender.com/docs
+- **Swagger UI (local)**: http://localhost:8000/docs
+- **ReDoc (local)**: http://localhost:8000/redoc
 
 ## API Endpoints
 
@@ -133,3 +141,30 @@ alembic revision --autogenerate -m "description"
 |------|-------|----------|
 | Admin | `admin@bookstore.com` | `admin123456` |
 | User | `user@bookstore.com` | `user123456` |
+
+## Deployment
+
+### Docker
+
+```bash
+# Build image
+docker build -t bookstore-backend .
+
+# Run container
+docker run -p 8000:8000 \
+  -e DATABASE_URL=postgresql+asyncpg://user:pass@host:5432/db \
+  -e SECRET_KEY=your-secret-key \
+  bookstore-backend
+```
+
+### Render
+
+The app is configured to deploy via the monorepo's `render.yaml` blueprint.
+
+**Environment Variables:**
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | PostgreSQL connection string (auto-converted from `postgres://`) |
+| `SECRET_KEY` | JWT signing key |
+| `RUN_MIGRATIONS` | Set to `true` for auto-migrations on startup |
+| `AUTO_SEED` | Set to `true` for auto-seeding on startup |
