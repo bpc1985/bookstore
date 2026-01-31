@@ -7,7 +7,7 @@ from sqlalchemy import pool
 from alembic import context
 
 from app.database import Base
-from app.models import User, TokenBlacklist, Category, Book, book_categories, CartItem, Order, OrderItem, OrderStatusHistory, Payment, Review
+from app.models import User, TokenBlacklist, Category, Book, book_categories, CartItem, Order, OrderItem, OrderStatusHistory, Review
 
 config = context.config
 
