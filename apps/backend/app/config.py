@@ -1,28 +1,28 @@
-import os
 from pydantic_settings import BaseSettings
+from pydantic import field_validator
 from functools import lru_cache
 
 
-def get_database_url() -> str:
-    """Get database URL, converting Render's postgres:// to postgresql+asyncpg://"""
-    url = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./bookstore.db")
-    # Render uses postgres://, but SQLAlchemy asyncpg needs postgresql+asyncpg://
-    if url.startswith("postgres://"):
-        url = url.replace("postgres://", "postgresql+asyncpg://", 1)
-    elif url.startswith("postgresql://"):
-        url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
-    return url
-
-
 class Settings(BaseSettings):
-    database_url: str = get_database_url()
-    secret_key: str = os.getenv("SECRET_KEY", "dev-secret-key-not-for-production")
-    algorithm: str =  os.getenv("ALGORITHM", "HS256")
-    access_token_expire_minutes: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 15))
-    refresh_token_expire_days: int = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", 7))
+    # pydantic-settings automatically reads from env vars (case-insensitive)
+    database_url: str = "sqlite+aiosqlite:///./bookstore.db"
+    secret_key: str = "dev-secret-key-not-for-production"
+    algorithm: str = "HS256"
+    access_token_expire_minutes: int = 15
+    refresh_token_expire_days: int = 7
 
     payment_retry_max_attempts: int = 3
     payment_retry_delay_seconds: int = 2
+
+    @field_validator("database_url", mode="after")
+    @classmethod
+    def convert_database_url(cls, v: str) -> str:
+        """Convert Render's postgres:// to postgresql+asyncpg:// for async SQLAlchemy"""
+        if v.startswith("postgres://"):
+            return v.replace("postgres://", "postgresql+asyncpg://", 1)
+        if v.startswith("postgresql://"):
+            return v.replace("postgresql://", "postgresql+asyncpg://", 1)
+        return v
 
     class Config:
         env_file = ".env"
