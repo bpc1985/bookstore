@@ -1,30 +1,28 @@
 # Build from monorepo root: docker build -f apps/frontend/Dockerfile .
 
 FROM node:20-alpine AS base
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 WORKDIR /app
 
-# Install dependencies
-FROM base AS deps
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
-COPY apps/frontend/package.json ./apps/frontend/
-COPY packages/types/package.json ./packages/types/
-RUN pnpm install --frozen-lockfile
-
-# Build application
+# Install dependencies and build
 FROM base AS builder
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/frontend/node_modules ./apps/frontend/node_modules
+
+# Copy all workspace files needed for install
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/types ./packages/types
 COPY apps/frontend ./apps/frontend
 
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Build args
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV DOCKER_BUILD=true
 
-WORKDIR /app/apps/frontend
-RUN pnpm build
+# Build the frontend
+RUN pnpm --filter @bookstore/frontend build
 
 # Production image
 FROM node:20-alpine AS runner
@@ -38,6 +36,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
+# Copy standalone output
 COPY --from=builder --chown=nextjs:nodejs /app/apps/frontend/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/frontend/.next/static ./apps/frontend/.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/apps/frontend/public ./apps/frontend/public
