@@ -1,0 +1,47 @@
+# Render Blueprint - https://render.com/docs/blueprint-spec
+# Deploy: Connect repo to Render, it will auto-detect this file
+
+services:
+  # FastAPI Backend
+  - type: web
+    name: bookstore-api
+    runtime: docker
+    region: frankfurt # Change to your preferred region
+    plan: free # free, starter, standard, pro
+    dockerfilePath: ./apps/backend/Dockerfile
+    dockerContext: ./apps/backend
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: bookstore-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "15"
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: "7"
+
+  # Next.js Frontend
+  - type: web
+    name: bookstore-web
+    runtime: docker
+    region: frankfurt # Change to your preferred region
+    plan: free
+    dockerfilePath: ./apps/frontend/Dockerfile
+    dockerContext: . # Build from monorepo root for workspace deps
+    envVars:
+      # Set this after first deploy: https://bookstore-api.onrender.com
+      # Or use your custom domain for the API
+      - key: NEXT_PUBLIC_API_URL
+        sync: false # Manually set in Render dashboard
+
+databases:
+  - name: bookstore-db
+    region: frankfurt # Same region as services
+    plan: free # free tier: 1GB, expires after 90 days
+    databaseName: bookstore
+    user: bookstore

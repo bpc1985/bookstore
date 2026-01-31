@@ -16,14 +16,17 @@ if config.config_file_name is not None:
 
 target_metadata = Base.metadata
 
-# Get DATABASE_URL from environment, converting async driver to sync for Alembic
+# Get DATABASE_URL from environment, converting to sync driver for Alembic
 def get_sync_database_url():
     url = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./bookstore.db")
-    # Alembic needs sync drivers, convert async to sync
+    # Alembic needs sync drivers
     if url.startswith("sqlite+aiosqlite"):
         return url.replace("sqlite+aiosqlite", "sqlite")
     if url.startswith("postgresql+asyncpg"):
         return url.replace("postgresql+asyncpg", "postgresql")
+    # Handle Render's postgres:// format (convert to sync postgresql://)
+    if url.startswith("postgres://"):
+        return url.replace("postgres://", "postgresql://", 1)
     return url
 
 
