@@ -27,8 +27,23 @@ def run_migrations():
             )
             logger.info(f"Migrations completed: {result.stdout}")
         except subprocess.CalledProcessError as e:
-            logger.error(f"Migration failed: {e.stderr}")
-            raise
+            # If tables already exist (created by create_tables), stamp the db
+            if "already exists" in e.stderr:
+                logger.warning("Tables already exist, stamping database with current migration...")
+                try:
+                    stamp_result = subprocess.run(
+                        ["alembic", "stamp", "head"],
+                        capture_output=True,
+                        text=True,
+                        check=True
+                    )
+                    logger.info(f"Database stamped: {stamp_result.stdout}")
+                except subprocess.CalledProcessError as stamp_error:
+                    logger.error(f"Stamp failed: {stamp_error.stderr}")
+                    raise
+            else:
+                logger.error(f"Migration failed: {e.stderr}")
+                raise
 
 
 def run_seed():
