@@ -15,7 +15,6 @@ RUN pnpm install --frozen-lockfile
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/frontend/node_modules ./apps/frontend/node_modules
-COPY --from=deps /app/packages/types/node_modules ./packages/types/node_modules
 COPY packages/types ./packages/types
 COPY apps/frontend ./apps/frontend
 
