@@ -55,11 +55,16 @@ def run_seed():
                 ["python", "seeds/seed_data.py"],
                 capture_output=True,
                 text=True,
-                check=True
+                check=True,
+                env=os.environ.copy()  # Ensure env vars are passed
             )
             logger.info(f"Seeding completed: {result.stdout}")
+            if result.stderr:
+                logger.info(f"Seed stderr: {result.stderr}")
         except subprocess.CalledProcessError as e:
-            logger.warning(f"Seeding failed (may already be seeded): {e.stderr}")
+            logger.error(f"Seeding failed - stdout: {e.stdout}")
+            logger.error(f"Seeding failed - stderr: {e.stderr}")
+            # Don't raise - allow app to start even if seeding fails
 
 
 @asynccontextmanager

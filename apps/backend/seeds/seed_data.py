@@ -1154,8 +1154,11 @@ USERS = [
 
 async def seed_database():
     from sqlalchemy import select
+    import os
 
-    await create_tables()
+    # Only create tables if not using Alembic migrations
+    if os.getenv("RUN_MIGRATIONS", "false").lower() != "true":
+        await create_tables()
 
     async with AsyncSessionLocal() as db:
         # Check if already seeded
@@ -1174,8 +1177,10 @@ async def seed_database():
 
         print("Seeding books...")
         for book_data in BOOKS:
-            cat_names = book_data.pop("categories")
-            book = Book(**book_data)
+            # Use .get() to avoid modifying original dict
+            cat_names = book_data.get("categories", [])
+            book_fields = {k: v for k, v in book_data.items() if k != "categories"}
+            book = Book(**book_fields)
             book.categories = [categories_map[name] for name in cat_names]
             db.add(book)
 
