@@ -1,21 +1,14 @@
+import os
 from pydantic_settings import BaseSettings
 from functools import lru_cache
 
 
 class Settings(BaseSettings):
-    database_url: str = "sqlite+aiosqlite:///./bookstore.db"
-    secret_key: str = "dev-secret-key-not-for-production"
-    algorithm: str = "HS256"
-    access_token_expire_minutes: int = 15
-    refresh_token_expire_days: int = 7
-
-    stripe_secret_key: str = ""
-    stripe_publishable_key: str = ""
-    stripe_webhook_secret: str = ""
-    paypal_client_id: str = ""
-    paypal_client_secret: str = ""
-    paypal_mode: str = "sandbox"
-    paypal_webhook_id: str = ""
+    database_url: str = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./bookstore.db")
+    secret_key: str = os.getenv("SECRET_KEY", "dev-secret-key-not-for-production")
+    algorithm: str =  os.getenv("ALGORITHM", "HS256")
+    access_token_expire_minutes: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 15))
+    refresh_token_expire_days: int = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", 7))
 
     payment_retry_max_attempts: int = 3
     payment_retry_delay_seconds: int = 2

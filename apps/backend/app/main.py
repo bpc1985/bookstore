@@ -62,4 +62,7 @@ app.include_router(admin_router)
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy"}
+    return {
+        "status": "healthy",
+        "service": "bookstore-api"
+    }
