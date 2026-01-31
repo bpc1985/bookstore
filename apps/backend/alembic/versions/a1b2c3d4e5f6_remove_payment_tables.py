@@ -1,7 +1,7 @@
 """Remove payment tables
 
-Revision ID: remove_payment_tables
-Revises: cff051ce11fe_initial_user_auth
+Revision ID: a1b2c3d4e5f6
+Revises: 681f1fb26232
 Create Date: 2026-01-24 19:40:00.000000
 
 """
@@ -9,8 +9,8 @@ from alembic import op
 import sqlalchemy as sa
 
 
-revision = 'remove_payment_tables'
-down_revision = 'cff051ce11fe_initial_user_auth'
+revision = 'a1b2c3d4e5f6'
+down_revision = '681f1fb26232'
 
 
 def upgrade():
