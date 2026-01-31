@@ -50,7 +50,10 @@ def run_seed():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     run_migrations()
-    await create_tables()
+    # Note: create_tables() is not needed when using Alembic migrations
+    # Only call it if not running migrations (local dev with SQLite)
+    if os.getenv("RUN_MIGRATIONS", "false").lower() != "true":
+        await create_tables()
     run_seed()
     yield
 
