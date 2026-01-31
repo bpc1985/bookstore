@@ -1153,9 +1153,17 @@ USERS = [
 
 
 async def seed_database():
+    from sqlalchemy import select
+
     await create_tables()
 
     async with AsyncSessionLocal() as db:
+        # Check if already seeded
+        existing_user = await db.execute(select(User).limit(1))
+        if existing_user.scalar_one_or_none():
+            print("Database already seeded, skipping...")
+            return
+
         print("Seeding categories...")
         categories_map = {}
         for cat_data in CATEGORIES:

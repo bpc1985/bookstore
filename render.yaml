@@ -24,6 +24,10 @@ services:
         value: "15"
       - key: REFRESH_TOKEN_EXPIRE_DAYS
         value: "7"
+      - key: RUN_MIGRATIONS
+        value: "true"
+      - key: AUTO_SEED
+        value: "true"  # Set to "false" after initial deploy if you don't want re-seeding
 
   # Next.js Frontend
   - type: web

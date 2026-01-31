@@ -1,3 +1,5 @@
+import os
+import subprocess
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,9 +14,44 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+def run_migrations():
+    """Run Alembic migrations on startup"""
+    if os.getenv("RUN_MIGRATIONS", "false").lower() == "true":
+        logger.info("Running database migrations...")
+        try:
+            result = subprocess.run(
+                ["alembic", "upgrade", "head"],
+                capture_output=True,
+                text=True,
+                check=True
+            )
+            logger.info(f"Migrations completed: {result.stdout}")
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Migration failed: {e.stderr}")
+            raise
+
+
+def run_seed():
+    """Run seed script on startup (for testing/demo)"""
+    if os.getenv("AUTO_SEED", "false").lower() == "true":
+        logger.info("Running database seed...")
+        try:
+            result = subprocess.run(
+                ["python", "seeds/seed_data.py"],
+                capture_output=True,
+                text=True,
+                check=True
+            )
+            logger.info(f"Seeding completed: {result.stdout}")
+        except subprocess.CalledProcessError as e:
+            logger.warning(f"Seeding failed (may already be seeded): {e.stderr}")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    run_migrations()
     await create_tables()
+    run_seed()
     yield
 
 
