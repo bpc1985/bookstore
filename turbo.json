@@ -25,6 +25,25 @@
         "^build"
       ]
     },
+    "test": {
+      "cache": true,
+      "outputs": [
+        "coverage/**"
+      ]
+    },
+    "test:ui": {
+      "cache": false,
+      "persistent": true
+    },
+    "test:run": {
+      "cache": true
+    },
+    "test:coverage": {
+      "cache": true,
+      "outputs": [
+        "coverage/**"
+      ]
+    },
     "start": {
       "cache": false,
       "persistent": true

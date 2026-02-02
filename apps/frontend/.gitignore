@@ -44,3 +44,8 @@ next-env.d.ts
 
 # Claude
 CLAUDE.md
+
+# Testing
+TEST_STATUS.md
+TEST_SUMMARY.md
+TESTING.md
