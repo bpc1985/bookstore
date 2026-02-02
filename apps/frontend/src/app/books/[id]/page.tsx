@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { BookOpen, Minus, Plus, ShoppingCart, Star, Check, ArrowLeft, Share2, Heart } from 'lucide-react';
+import { useForm } from '@tanstack/react-form';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +13,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { api } from '@/lib/api';
+import { reviewSchema } from '@/lib/schemas';
+import { useCreateReviewMutation } from '@/lib/hooks';
 import { useAuthStore } from '@/stores/auth';
 import { useCartStore } from '@/stores/cart';
 import { toast } from 'sonner';
@@ -33,6 +36,7 @@ function StarRating({ rating, onRate, size = 'md' }: { rating: number; onRate?: 
       {[1, 2, 3, 4, 5].map((star) => (
         <button
           key={star}
+          type="button"
           onClick={() => onRate?.(star)}
           disabled={!onRate}
           className={`${onRate ? 'cursor-pointer hover:scale-110 transition-transform' : 'cursor-default'}`}
@@ -58,10 +62,38 @@ export default function BookDetailPage() {
   const [reviews, setReviews] = useState<PaginatedResponse<Review> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
-  const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
-  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   const bookId = parseInt(params.id as string);
+  const createReviewMutation = useCreateReviewMutation(bookId);
+
+  const reviewForm = useForm({
+    defaultValues: {
+      rating: 5,
+      comment: '',
+    },
+    validators: {
+      onSubmit: reviewSchema,
+    },
+    onSubmit: async ({ value }) => {
+      if (!user) {
+        router.push('/login');
+        return;
+      }
+      try {
+        await createReviewMutation.mutateAsync(value);
+        toast.success('Review submitted!');
+        reviewForm.reset();
+        const [reviewsData, bookData] = await Promise.all([
+          api.getBookReviews(bookId),
+          api.getBook(bookId),
+        ]);
+        setReviews(reviewsData);
+        setBook(bookData);
+      } catch (error) {
+        toast.error((error as Error).message);
+      }
+    },
+  });
 
   useEffect(() => {
     async function fetchData() {
@@ -95,28 +127,6 @@ export default function BookDetailPage() {
       toast.success('Added to cart!');
     } catch (error) {
       toast.error((error as Error).message);
-    }
-  };
-
-  const handleSubmitReview = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) {
-      router.push('/login');
-      return;
-    }
-    setIsSubmittingReview(true);
-    try {
-      await api.createReview(bookId, newReview);
-      toast.success('Review submitted!');
-      setNewReview({ rating: 5, comment: '' });
-      const reviewsData = await api.getBookReviews(bookId);
-      setReviews(reviewsData);
-      const bookData = await api.getBook(bookId);
-      setBook(bookData);
-    } catch (error) {
-      toast.error((error as Error).message);
-    } finally {
-      setIsSubmittingReview(false);
     }
   };
 
@@ -345,26 +355,48 @@ export default function BookDetailPage() {
               </CardHeader>
               <CardContent>
                 {user ? (
-                  <form onSubmit={handleSubmitReview} className="space-y-4">
-                    <div>
-                      <label className="text-sm font-medium mb-3 block">Your Rating</label>
-                      <StarRating
-                        rating={newReview.rating}
-                        onRate={(r) => setNewReview({ ...newReview, rating: r })}
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Your Review</label>
-                      <Textarea
-                        placeholder="Share your thoughts about this book..."
-                        value={newReview.comment}
-                        onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
-                        rows={4}
-                        className="resize-none bg-muted/50 border-0"
-                      />
-                    </div>
-                    <Button type="submit" disabled={isSubmittingReview} className="w-full">
-                      {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      reviewForm.handleSubmit();
+                    }}
+                    className="space-y-4"
+                  >
+                    <reviewForm.Field name="rating">
+                      {(field) => (
+                        <div>
+                          <label className="text-sm font-medium mb-3 block">Your Rating</label>
+                          <StarRating
+                            rating={field.state.value}
+                            onRate={(r) => field.handleChange(r)}
+                          />
+                          {field.state.meta.errors[0] && (
+                            <p className="text-sm text-destructive mt-1">
+                              {typeof field.state.meta.errors[0] === 'string'
+                                ? field.state.meta.errors[0]
+                                : field.state.meta.errors[0].message}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </reviewForm.Field>
+                    <reviewForm.Field name="comment">
+                      {(field) => (
+                        <div>
+                          <label className="text-sm font-medium mb-2 block">Your Review</label>
+                          <Textarea
+                            placeholder="Share your thoughts about this book..."
+                            value={field.state.value}
+                            onChange={(e) => field.handleChange(e.target.value)}
+                            onBlur={field.handleBlur}
+                            rows={4}
+                            className="resize-none bg-muted/50 border-0"
+                          />
+                        </div>
+                      )}
+                    </reviewForm.Field>
+                    <Button type="submit" disabled={createReviewMutation.isPending} className="w-full">
+                      {createReviewMutation.isPending ? 'Submitting...' : 'Submit Review'}
                     </Button>
                   </form>
                 ) : (

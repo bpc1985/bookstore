@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { User, Mail, Calendar, Package, Star, ShieldCheck } from "lucide-react";
+import { useForm } from '@tanstack/react-form';
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -20,6 +21,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuthStore } from "@/stores/auth";
 import { api } from "@/lib/api";
+import { profileUpdateSchema } from '@/lib/schemas';
+import { useUpdateProfileMutation } from '@/lib/hooks';
 import { toast } from "sonner";
 import type { OrderListItem } from "@bookstore/types";
 import AuthGuard from "@/components/middleware/AuthGuard";
@@ -27,12 +30,25 @@ import AuthGuard from "@/components/middleware/AuthGuard";
 export default function ProfilePage() {
   const router = useRouter();
   const { user, isInitialized } = useAuthStore();
-  const [isUpdating, setIsUpdating] = useState(false);
   const [recentOrders, setRecentOrders] = useState<OrderListItem[]>([]);
   const [isLoadingOrders, setIsLoadingOrders] = useState(true);
-  const [formData, setFormData] = useState({
-    full_name: "",
-    email: "",
+  const updateProfileMutation = useUpdateProfileMutation();
+
+  const form = useForm({
+    defaultValues: {
+      full_name: user?.full_name || '',
+    },
+    validators: {
+      onSubmit: profileUpdateSchema,
+    },
+    onSubmit: async ({ value }) => {
+      try {
+        await updateProfileMutation.mutateAsync(value);
+        toast.success("Profile updated successfully");
+      } catch (error) {
+        toast.error((error as Error).message);
+      }
+    },
   });
 
   useEffect(() => {
@@ -43,13 +59,10 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (user) {
-      setFormData({
-        full_name: user.full_name,
-        email: user.email,
-      });
+      form.setFieldValue('full_name', user.full_name);
       fetchRecentOrders();
     }
-  }, [user]);
+  }, [user, form]);
 
   async function fetchRecentOrders() {
     setIsLoadingOrders(true);
@@ -62,19 +75,6 @@ export default function ProfilePage() {
       setIsLoadingOrders(false);
     }
   }
-
-  const handleUpdateProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsUpdating(true);
-    try {
-      await api.updateProfile({ full_name: formData.full_name });
-      toast.success("Profile updated successfully");
-    } catch (error) {
-      toast.error((error as Error).message);
-    } finally {
-      setIsUpdating(false);
-    }
-  };
 
   if (!user) {
     return null;
@@ -149,27 +149,39 @@ export default function ProfilePage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <form onSubmit={handleUpdateProfile} className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="full_name">Full Name</Label>
-                        <Input
-                          id="full_name"
-                          value={formData.full_name}
-                          onChange={e =>
-                            setFormData({
-                              ...formData,
-                              full_name: e.target.value,
-                            })
-                          }
-                          required
-                        />
-                      </div>
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        form.handleSubmit();
+                      }}
+                      className="space-y-4"
+                    >
+                      <form.Field name="full_name">
+                        {(field) => (
+                          <div className="space-y-2">
+                            <Label htmlFor="full_name">Full Name</Label>
+                            <Input
+                              id="full_name"
+                              value={field.state.value}
+                              onChange={(e) => field.handleChange(e.target.value)}
+                              onBlur={field.handleBlur}
+                            />
+                            {field.state.meta.errors[0] && (
+                              <p className="text-sm text-destructive">
+                                {typeof field.state.meta.errors[0] === 'string'
+                                  ? field.state.meta.errors[0]
+                                  : field.state.meta.errors[0].message}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </form.Field>
                       <div className="space-y-2">
                         <Label htmlFor="email">Email Address</Label>
                         <Input
                           id="email"
                           type="email"
-                          value={formData.email}
+                          value={user.email}
                           disabled
                           placeholder="you@example.com"
                         />
@@ -177,8 +189,8 @@ export default function ProfilePage() {
                           Email cannot be changed
                         </p>
                       </div>
-                      <Button type="submit" disabled={isUpdating}>
-                        {isUpdating ? "Saving..." : "Save Changes"}
+                      <Button type="submit" disabled={updateProfileMutation.isPending}>
+                        {updateProfileMutation.isPending ? "Saving..." : "Save Changes"}
                       </Button>
                     </form>
                   </CardContent>

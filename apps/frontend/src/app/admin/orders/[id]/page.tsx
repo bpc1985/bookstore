@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, BookOpen, Clock, CheckCircle, XCircle, Truck, CreditCard, Loader2 } from 'lucide-react';
+import { useForm } from '@tanstack/react-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -13,6 +14,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { api } from '@/lib/api';
+import { orderStatusSchema } from '@/lib/schemas';
+import { useUpdateOrderStatusMutation } from '@/lib/hooks';
 import { toast } from 'sonner';
 import type { Order, OrderStatus } from '@/types';
 
@@ -37,11 +40,33 @@ export default function AdminOrderDetailPage() {
   const router = useRouter();
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [newStatus, setNewStatus] = useState<OrderStatus | ''>('');
-  const [statusNote, setStatusNote] = useState('');
 
   const orderId = parseInt(params.id as string);
+  const updateStatusMutation = useUpdateOrderStatusMutation(orderId);
+
+  const form = useForm({
+    defaultValues: {
+      status: '' as OrderStatus | '',
+      note: '',
+    },
+    validators: {
+      onSubmit: orderStatusSchema,
+    },
+    onSubmit: async ({ value }) => {
+      if (!order || !value.status) return;
+      try {
+        const updatedOrder = await updateStatusMutation.mutateAsync({
+          status: value.status as OrderStatus,
+          note: value.note,
+        });
+        setOrder(updatedOrder);
+        form.reset();
+        toast.success('Order status updated');
+      } catch (error) {
+        toast.error((error as Error).message);
+      }
+    },
+  });
 
   useEffect(() => {
     async function fetchOrder() {
@@ -58,22 +83,6 @@ export default function AdminOrderDetailPage() {
     }
     fetchOrder();
   }, [orderId, router]);
-
-  const handleUpdateStatus = async () => {
-    if (!order || !newStatus) return;
-    setIsUpdating(true);
-    try {
-      const updatedOrder = await api.updateOrderStatus(order.id, newStatus, statusNote || undefined);
-      setOrder(updatedOrder);
-      setNewStatus('');
-      setStatusNote('');
-      toast.success('Order status updated');
-    } catch (error) {
-      toast.error((error as Error).message);
-    } finally {
-      setIsUpdating(false);
-    }
-  };
 
   if (isLoading) {
     return (
@@ -233,45 +242,72 @@ export default function AdminOrderDetailPage() {
               <CardHeader>
                 <CardTitle>Update Status</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label>New Status</Label>
-                  <Select value={newStatus} onValueChange={(v) => setNewStatus(v as OrderStatus)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select new status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableTransitions.map((status) => (
-                        <SelectItem key={status} value={status}>
-                          {statusConfig[status].label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Note (optional)</Label>
-                  <Textarea
-                    placeholder="Add a note about this status change..."
-                    value={statusNote}
-                    onChange={(e) => setStatusNote(e.target.value)}
-                    rows={3}
-                  />
-                </div>
-                <Button
-                  className="w-full"
-                  onClick={handleUpdateStatus}
-                  disabled={!newStatus || isUpdating}
+              <CardContent>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    form.handleSubmit();
+                  }}
+                  className="space-y-4"
                 >
-                  {isUpdating ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Updating...
-                    </>
-                  ) : (
-                    'Update Status'
-                  )}
-                </Button>
+                  <form.Field name="status">
+                    {(field) => (
+                      <div className="space-y-2">
+                        <Label>New Status</Label>
+                        <Select
+                          value={field.state.value}
+                          onValueChange={(v) => field.handleChange(v as OrderStatus)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select new status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {availableTransitions.map((status) => (
+                              <SelectItem key={status} value={status}>
+                                {statusConfig[status].label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {field.state.meta.errors[0] && (
+                          <p className="text-sm text-destructive">
+                            {typeof field.state.meta.errors[0] === 'string'
+                              ? field.state.meta.errors[0]
+                              : field.state.meta.errors[0].message}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </form.Field>
+                  <form.Field name="note">
+                    {(field) => (
+                      <div className="space-y-2">
+                        <Label>Note (optional)</Label>
+                        <Textarea
+                          placeholder="Add a note about this status change..."
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          onBlur={field.handleBlur}
+                          rows={3}
+                        />
+                      </div>
+                    )}
+                  </form.Field>
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={!form.getFieldValue('status') || updateStatusMutation.isPending}
+                  >
+                    {updateStatusMutation.isPending ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Updating...
+                      </>
+                    ) : (
+                      'Update Status'
+                    )}
+                  </Button>
+                </form>
               </CardContent>
             </Card>
           )}

@@ -1,13 +1,6 @@
 ---
 trigger: model_decision
-description: Four-phase debugging methodology with root cause analysis. Use when investigating bugs, fixing test failures, or troubleshooting unexpected behavior. Emphasizes NO FIXES WITHOUT ROOT CAUSE FIRST.
----
-
----
-
-name: systematic-debugging
-description: Four-phase debugging methodology with root cause analysis. Use when investigating bugs, fixing test failures, or troubleshooting unexpected behavior. Emphasizes NO FIXES WITHOUT ROOT CAUSE FIRST.
-
+description: Four-phase debugging methodology with root cause analysis. Use when investigating bugs, fixing test failures, or troubleshooting unexpected behavior.
 ---
 
 # Systematic Debugging
@@ -27,17 +20,17 @@ Before touching any code:
 1. **Read error messages thoroughly** - Every word matters
 2. **Reproduce the issue consistently** - If you can't reproduce it, you can't verify a fix
 3. **Examine recent changes** - What changed before this started failing?
-4. **Gather diagnostic evidence** - Logs, stack traces, state dumps
+4. **Gather diagnostic evidence** - Logs, stack traces, network requests
 5. **Trace data flow** - Follow the call chain to find where bad values originate
 
 **Root Cause Tracing Technique:**
 
 ```
-1. Observe the symptom - Where does the error manifest?
-2. Find immediate cause - Which code directly produces the error?
-3. Ask "What called this?" - Map the call chain upward
-4. Keep tracing up - Follow invalid data backward through the stack
-5. Find original trigger - Where did the problem actually start?
+1. Observe the symptom     → Where does the error manifest?
+2. Find immediate cause    → Which code directly produces the error?
+3. Ask "What called this?" → Map the call chain upward
+4. Keep tracing up         → Follow invalid data backward through the stack
+5. Find original trigger   → Where did the problem actually start?
 ```
 
 **Key principle:** Never fix problems solely where errors appear—always trace to the original trigger.
@@ -70,24 +63,52 @@ Apply the scientific method:
 
 **Critical rule:** If THREE or more fixes fail consecutively, STOP. This signals architectural problems requiring discussion, not more patches.
 
-## Red Flags - Process Violations
+## Project-Specific Debugging
 
-Stop immediately if you catch yourself thinking:
+### Frontend Issues
 
-- "Quick fix for now, investigate later"
-- "One more fix attempt" (after multiple failures)
-- "This should work" (without understanding why)
-- "Let me just try..." (without hypothesis)
-- "It works on my machine" (without investigating difference)
+```bash
+# Check for TypeScript errors
+pnpm typecheck
 
-## Warning Signs of Deeper Problems
+# Check browser console for:
+# - Network errors (API calls failing)
+# - React errors (component crashes)
+# - Auth issues (token problems)
 
-**Consecutive fixes revealing new problems in different areas** indicates architectural issues:
+# Check Zustand store state
+# In browser console:
+useAuthStore.getState()
+useCartStore.getState()
+```
 
-- Stop patching
-- Document what you've found
-- Discuss with team before proceeding
-- Consider if the design needs rethinking
+### Backend Issues
+
+```bash
+# Check FastAPI logs (runs with --reload)
+pnpm backend:dev
+
+# Check database state
+sqlite3 apps/backend/bookstore.db ".tables"
+sqlite3 apps/backend/bookstore.db "SELECT * FROM users LIMIT 5;"
+
+# Reset database if needed
+rm apps/backend/bookstore.db
+pnpm backend:migrate
+pnpm backend:seed
+```
+
+### API Integration Issues
+
+```bash
+# Test API endpoint directly
+curl http://localhost:8000/health
+curl http://localhost:8000/books
+
+# Check CORS (browser console Network tab)
+# Check Authorization header is being sent
+# Check token expiration (15 min access, 7 day refresh)
+```
 
 ## Common Debugging Scenarios
 
@@ -115,6 +136,9 @@ Stop immediately if you catch yourself thinking:
 
 ```
 1. Use git bisect to find the breaking commit
+   git bisect start
+   git bisect bad HEAD
+   git bisect good <last-known-good-commit>
 2. Compare the change with previous working version
 3. Identify what assumption changed
 4. Fix at the source of the assumption violation
@@ -130,6 +154,34 @@ Stop immediately if you catch yourself thinking:
 5. Add deterministic waits or proper synchronization
 ```
 
+### Auth Issues
+
+```
+1. Check if tokens exist in localStorage
+2. Verify token is being sent in Authorization header
+3. Check token expiration (jwt.io to decode)
+4. Verify backend is validating correctly
+5. Check CORS preflight for auth endpoints
+```
+
+## Red Flags - Stop Immediately
+
+Stop if you catch yourself:
+
+- "Quick fix for now, investigate later"
+- "One more fix attempt" (after multiple failures)
+- "This should work" (without understanding why)
+- "Let me just try..." (without hypothesis)
+
+## Warning Signs of Deeper Problems
+
+**Consecutive fixes revealing new problems in different areas** indicates architectural issues:
+
+- Stop patching
+- Document what you've found
+- Consider if the design needs rethinking
+- May need to refactor rather than patch
+
 ## Debugging Checklist
 
 Before claiming a bug is fixed:
@@ -139,21 +191,6 @@ Before claiming a bug is fixed:
 - [ ] Fix addresses root cause, not symptoms
 - [ ] Failing test created that reproduces bug
 - [ ] Test now passes with fix
-- [ ] Full test suite passes
+- [ ] `pnpm typecheck` passes
 - [ ] No "quick fix" rationalization used
 - [ ] Fix is minimal and focused
-
-## Success Metrics
-
-Systematic debugging achieves ~95% first-time fix rate vs ~40% with ad-hoc approaches.
-
-Signs you're doing it right:
-
-- Fixes don't create new bugs
-- You can explain WHY the bug occurred
-- Similar bugs don't recur
-- Code is better after the fix, not just "working"
-
-## Integration with Other Skills
-
-- **testing-patterns**: Create test that reproduces the bug before fixing
