@@ -13,13 +13,6 @@
     "backend:migrate": "turbo run migrate --filter=@bookstore/backend",
     "frontend:dev": "turbo run dev --filter=@bookstore/frontend",
     "frontend:build": "turbo run build --filter=@bookstore/frontend",
-    "frontend-nuxt:dev": "turbo run dev --filter=@bookstore/frontend-nuxt",
-    "frontend-nuxt:build": "turbo run build --filter=@bookstore/frontend-nuxt",
-    "frontend-vue:dev": "turbo run dev --filter=@bookstore/frontend-vue",
-    "frontend-vue:build": "turbo run build --filter=@bookstore/frontend-vue",
-    "backend-nestjs:dev": "turbo run dev --filter=@bookstore/backend-nestjs",
-    "backend-nestjs:seed": "turbo run seed --filter=@bookstore/backend-nestjs",
-    "backend-nestjs:migrate": "turbo run migrate --filter=@bookstore/backend-nestjs",
     "clean": "turbo run clean && rm -rf node_modules",
     "typecheck": "turbo run typecheck"
   },

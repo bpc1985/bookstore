@@ -12,10 +12,7 @@
       "outputs": [
         ".next/**",
         "!.next/cache/**",
-        ".nuxt/**",
-        "!.nuxt/cache/**",
-        "dist/**",
-        ".output/**"
+        "dist/**"
       ]
     },
     "lint": {
@@ -40,30 +37,6 @@
     },
     "clean": {
       "cache": false
-    },
-    "frontend-vue:dev": {
-      "cache": false,
-      "persistent": true
-    },
-    "frontend-vue:build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "dist/**"
-      ]
-    },
-    "frontend-nuxt:dev": {
-      "cache": false,
-      "persistent": true
-    },
-    "frontend-nuxt:build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        ".output/**"
-      ]
     }
   }
 }
