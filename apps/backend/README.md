@@ -129,6 +129,59 @@ alembic downgrade -1
 alembic revision --autogenerate -m "description"
 ```
 
+## Testing
+
+Tests are written with pytest and use async fixtures.
+
+### From Monorepo Root
+
+```bash
+pnpm backend:test            # Run all tests
+pnpm backend:test:unit       # Run unit tests only
+pnpm backend:test:coverage   # Run with coverage report
+```
+
+### From This Directory
+
+```bash
+pnpm test                    # Run all tests
+pytest                       # Run all tests directly
+pytest tests/unit/           # Run unit tests only
+pytest tests/integration/    # Run integration tests only
+
+# Run a single test file
+pytest tests/unit/test_services/test_book_service.py -v
+
+# Run a single test function
+pytest tests/unit/test_services/test_book_service.py::test_get_book_by_id -v
+
+# Run tests by marker
+pytest -m unit               # Unit tests only
+pytest -m integration        # Integration tests only
+
+# Run with coverage
+pytest --cov=app tests/
+```
+
+### Test Structure
+
+```
+tests/
+├── conftest.py              # Shared fixtures (db session, test client)
+├── unit/
+│   ├── test_services/       # Service layer tests
+│   ├── test_repositories/   # Repository layer tests
+│   └── test_routers/        # Router/endpoint tests (mocked deps)
+│       └── conftest.py      # Router-specific fixtures
+└── integration/
+    └── conftest.py          # Integration test fixtures
+```
+
+### Test Markers
+
+- `@pytest.mark.unit` - Unit tests (fast, isolated)
+- `@pytest.mark.integration` - Integration tests (database, slower)
+
 ## Authentication
 
 - JWT-based with access tokens (15 min) and refresh tokens (7 days)

@@ -37,6 +37,46 @@ pnpm lint              # Run ESLint
 pnpm typecheck         # Run TypeScript type checking
 ```
 
+## Testing
+
+Tests are written with Vitest and React Testing Library.
+
+### From Monorepo Root
+
+```bash
+pnpm frontend:test           # Run tests in watch mode
+pnpm frontend:test:ui        # Run with Vitest UI
+pnpm frontend:test:run       # Run tests once
+pnpm frontend:test:coverage  # Run with coverage report
+```
+
+### From This Directory
+
+```bash
+pnpm test                    # Run tests in watch mode
+pnpm test:ui                 # Run with Vitest UI
+pnpm test:run                # Run tests once
+pnpm test:coverage           # Run with coverage report
+
+# Run a single test file
+pnpm vitest run src/stores/__tests__/auth.test.ts
+
+# Run tests matching a pattern
+pnpm vitest run --testNamePattern="should login"
+```
+
+### Test Structure
+
+```
+src/
+├── stores/__tests__/        # Zustand store tests
+├── lib/__tests__/           # Utility and API client tests
+├── lib/hooks/__tests__/     # Custom hook tests
+├── lib/schemas/__tests__/   # Zod schema validation tests
+├── components/layout/__tests__/  # Layout component tests
+└── app/**/__tests__/        # Page component tests
+```
+
 ## Project Structure
 
 ```

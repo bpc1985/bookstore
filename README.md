@@ -146,6 +146,18 @@ Both backends are **functionally equivalent** with the same 33+ API endpoints.
 | `pnpm backend-nestjs:seed` | Seed NestJS database |
 | `pnpm backend-nestjs:migrate` | Run NestJS Prisma migrations |
 
+### Test Commands
+
+| Command | Description |
+|---------|-------------|
+| `pnpm test` | Run all tests |
+| `pnpm frontend:test` | Run frontend tests (Vitest) |
+| `pnpm frontend:test:ui` | Run frontend tests with Vitest UI |
+| `pnpm frontend:test:coverage` | Run frontend tests with coverage |
+| `pnpm backend:test` | Run backend tests (pytest) |
+| `pnpm backend:test:unit` | Run backend unit tests only |
+| `pnpm backend:test:coverage` | Run backend tests with coverage |
+
 ## Environment Variables
 
 ### Frontends
