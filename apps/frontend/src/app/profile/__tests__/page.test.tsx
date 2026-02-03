@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ProfilePage from '@/app/profile/page';
+import { api } from '@/lib/api';
 
 vi.mock('next/link', () => ({
   default: ({ children, href, ...props }: any) => (
@@ -24,7 +25,25 @@ vi.mock('@/stores/auth', () => ({
   }),
 }));
 
-vi.mock('@/lib/hooks', () => ({
+vi.mock('@/lib/api', () => ({
+  api: {
+    getOrders: vi.fn().mockResolvedValue({
+      items: [],
+      total: 0,
+      page: 1,
+      size: 5,
+      pages: 1,
+    }),
+    getProfile: vi.fn().mockResolvedValue({
+      id: 1,
+      email: 'test@example.com',
+      full_name: 'Test User',
+    }),
+    updateProfile: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+
+vi.mock('@/lib/hooks/use-profile', () => ({
   useUpdateProfileMutation: () => ({
     mutateAsync: vi.fn().mockResolvedValue(undefined),
     isPending: false,
@@ -59,9 +78,11 @@ describe('ProfilePage', () => {
     });
   });
 
-  it('should render without errors', () => {
+  it('should render without errors', async () => {
     render(<ProfilePage />, { wrapper: createWrapper });
 
-    expect(screen.getByText(/my profile/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/my profile/i)).toBeInTheDocument();
+    });
   });
 });

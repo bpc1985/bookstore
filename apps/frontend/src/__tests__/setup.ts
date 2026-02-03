@@ -1,6 +1,16 @@
+import React from 'react';
 import '@testing-library/jest-dom';
 import { expect, afterEach, vi, beforeAll, afterAll } from 'vitest';
 import { cleanup } from '@testing-library/react';
+
+// Mock ResizeObserver
+class ResizeObserverMock {
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+}
+
+global.ResizeObserver = ResizeObserverMock as any;
 
 // Cleanup after each test
 afterEach(() => {
@@ -29,8 +39,12 @@ vi.mock('next/navigation', () => ({
 }));
 
 // Mock next/link
+const MockLink = ({ children, href, ...props }: any) => {
+  return React.createElement('a', { href, ...props }, children);
+};
+
 vi.mock('next/link', () => ({
-  default: vi.fn(),
+  default: MockLink,
   __esModule: true,
 }));
 

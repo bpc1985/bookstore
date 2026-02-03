@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import OrdersPage from '@/app/orders/page';
 
@@ -46,9 +46,11 @@ describe('OrdersPage', () => {
     });
   });
 
-  it('should render without errors', () => {
+  it('should render without errors', async () => {
     render(<OrdersPage />);
 
-    expect(screen.getByText(/my orders/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/my orders/i)).toBeInTheDocument();
+    });
   });
 });
