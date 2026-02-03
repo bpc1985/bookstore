@@ -7,6 +7,7 @@
     "start": "uvicorn app.main:app --host 0.0.0.0 --port 8000",
     "seed": "python seeds/seed_data.py",
     "migrate": "alembic upgrade head",
+    "test": "pytest",
     "lint": "echo 'No linter configured'",
     "clean": "find . -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true"
   }
