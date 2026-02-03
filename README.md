@@ -31,11 +31,12 @@ Full-stack e-commerce bookstore application using **Turborepo** monorepo with pn
 
 | Layer | Technology |
 |-------|------------|
-| Frontend | Next.js 16 (React) or Vue 3 |
-| UI | shadcn/ui (Radix) or shadcn-vue |
-| State | Zustand (Next.js) or Pinia (Vue) |
-| Backend | FastAPI (Python) or NestJS (TypeScript) |
-| ORM | SQLAlchemy (FastAPI) or Prisma (NestJS) |
+| Frontend | Next.js 16 with App Router |
+| UI | shadcn/ui (Radix UI primitives) |
+| State | Zustand with persist middleware |
+| Data Fetching | TanStack React Query |
+| Backend | FastAPI (Python) |
+| ORM | SQLAlchemy 2.0 (async) |
 | Database | SQLite |
 | Monorepo | Turborepo + pnpm workspaces |
 
@@ -45,13 +46,9 @@ Full-stack e-commerce bookstore application using **Turborepo** monorepo with pn
 bookstore/
 ├── apps/
 │   ├── frontend/          # Next.js 16 — http://localhost:3000
-│   ├── frontend-vue/      # Vue 3 + Vite — http://localhost:3001
-│   ├── backend/           # FastAPI + SQLAlchemy — http://localhost:8000
-│   └── backend-nestjs/    # NestJS + Prisma — http://localhost:8001
+│   └── backend/           # FastAPI + SQLAlchemy — http://localhost:8000
 ├── packages/
-│   ├── types/             # @bookstore/types — shared TypeScript types
-│   ├── api/               # @bookstore/api — API client (Next.js)
-│   └── stores/            # @bookstore/stores — Zustand stores (Next.js)
+│   └── types/             # @bookstore/types — shared TypeScript types
 └── package.json
 ```
 
@@ -78,18 +75,11 @@ pnpm dev                     # Starts all apps
 ### Run Individual Apps
 
 ```bash
-# Frontends
 pnpm frontend:dev            # Next.js at http://localhost:3000
-pnpm frontend-vue:dev        # Vue at http://localhost:3001
-
-# Backends (choose one)
 pnpm backend:dev             # FastAPI at http://localhost:8000 (requires venv)
-pnpm backend-nestjs:dev      # NestJS at http://localhost:8001
 ```
 
 ## Backend Setup
-
-### Option 1: FastAPI (Python)
 
 ```bash
 cd apps/backend
@@ -101,21 +91,11 @@ pnpm backend:seed            # Seed sample data
 pnpm backend:migrate         # Run Alembic migrations
 ```
 
-### Option 2: NestJS (TypeScript)
-
-```bash
-pnpm backend-nestjs:migrate  # Apply Prisma schema
-pnpm backend-nestjs:seed     # Seed sample data
-pnpm backend-nestjs:dev      # Start server
-```
-
-Both backends are **functionally equivalent** with the same 33+ API endpoints.
-
 ## API Documentation
 
 - **Live Demo**: https://bookstore-api-i12k.onrender.com/docs
-- **FastAPI (local)**: http://localhost:8000/docs (Swagger UI)
-- **NestJS (local)**: http://localhost:8001/docs (Swagger UI)
+- **Local Swagger UI**: http://localhost:8000/docs
+- **Local ReDoc**: http://localhost:8000/redoc
 
 ## Monorepo Commands
 
@@ -124,6 +104,7 @@ Both backends are **functionally equivalent** with the same 33+ API endpoints.
 | `pnpm dev` | Start all apps in development mode |
 | `pnpm build` | Build all apps |
 | `pnpm lint` | Lint all apps |
+| `pnpm typecheck` | Type check all TypeScript packages |
 | `pnpm clean` | Clean all build artifacts and node_modules |
 
 ### Frontend Commands
@@ -132,8 +113,6 @@ Both backends are **functionally equivalent** with the same 33+ API endpoints.
 |---------|-------------|
 | `pnpm frontend:dev` | Start Next.js frontend |
 | `pnpm frontend:build` | Build Next.js frontend |
-| `pnpm frontend-vue:dev` | Start Vue frontend |
-| `pnpm frontend-vue:build` | Build Vue frontend |
 
 ### Backend Commands
 
@@ -142,9 +121,6 @@ Both backends are **functionally equivalent** with the same 33+ API endpoints.
 | `pnpm backend:dev` | Start FastAPI (requires venv) |
 | `pnpm backend:seed` | Seed FastAPI database |
 | `pnpm backend:migrate` | Run FastAPI Alembic migrations |
-| `pnpm backend-nestjs:dev` | Start NestJS |
-| `pnpm backend-nestjs:seed` | Seed NestJS database |
-| `pnpm backend-nestjs:migrate` | Run NestJS Prisma migrations |
 
 ### Test Commands
 
@@ -160,47 +136,36 @@ Both backends are **functionally equivalent** with the same 33+ API endpoints.
 
 ## Environment Variables
 
-### Frontends
+### Frontend
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `NEXT_PUBLIC_API_URL` | `http://localhost:8000` | API base URL (Next.js) |
-| `VITE_API_URL` | `http://localhost:8000` | API base URL (Vue) |
+| `NEXT_PUBLIC_API_URL` | `http://localhost:8000` | Backend API base URL |
 
-### Backends
+### Backend
 
-See `.env` files in each backend directory.
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `DATABASE_URL` | `sqlite+aiosqlite:///./bookstore.db` | Database connection string |
+| `SECRET_KEY` | (generated) | JWT signing key |
 
 ## Shared Packages
 
 ### @bookstore/types
 
-TypeScript type definitions shared between frontend apps.
-
-### @bookstore/api
-
-HTTP API client with support for:
-- Authentication (login, register, logout, token refresh)
-- Books CRUD and search
-- Cart management
-- Orders and payments
-- Reviews
-- Admin operations
-
-### @bookstore/stores
-
-Zustand state management stores for:
-- Auth (user session, JWT tokens with auto-refresh)
-- Cart (shopping cart with persistence)
+TypeScript type definitions shared between frontend and backend:
+- `User`, `Book`, `Category`, `Cart`, `Order`, `Review`
+- `PaginatedResponse`, `ApiError`
+- Request/response types for API endpoints
 
 ## Database
 
-Each backend maintains its own SQLite database:
+SQLite database with Alembic migrations:
 
-| Backend | Database File | Migrations |
-|---------|--------------|------------|
-| FastAPI | `apps/backend/bookstore.db` | Alembic |
-| NestJS | `apps/backend-nestjs/prisma/bookstore.db` | Prisma |
+| File | Description |
+|------|-------------|
+| `apps/backend/bookstore.db` | SQLite database file |
+| `apps/backend/alembic/` | Migration scripts |
 
 ## Deployment
 
