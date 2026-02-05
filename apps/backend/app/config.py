@@ -1,9 +1,15 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import field_validator
 from functools import lru_cache
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
+
     # pydantic-settings automatically reads from env vars (case-insensitive)
     database_url: str = "sqlite+aiosqlite:///./bookstore.db"
     secret_key: str = "dev-secret-key-not-for-production"
@@ -25,9 +31,6 @@ class Settings(BaseSettings):
         if v.startswith("postgresql://"):
             return v.replace("postgresql://", "postgresql+asyncpg://", 1)
         return v
-
-    class Config:
-        env_file = ".env"
 
 
 @lru_cache
