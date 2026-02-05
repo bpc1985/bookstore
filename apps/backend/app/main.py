@@ -126,17 +126,3 @@ async def health_check():
         "status": "healthy",
         "service": "bookstore-api"
     }
-
-
-@app.get("/debug/config")
-async def debug_config():
-    """Debug endpoint to check config values - REMOVE IN PRODUCTION"""
-    from app.config import get_settings
-    settings = get_settings()
-    return {
-        "google_redirect_uri": settings.google_redirect_uri,
-        "frontend_url": settings.frontend_url,
-        "google_client_id_set": bool(settings.google_client_id),
-        "google_client_secret_set": bool(settings.google_client_secret),
-        "env_google_redirect_uri": os.getenv("GOOGLE_REDIRECT_URI", "NOT SET"),
-    }
