@@ -11,11 +11,8 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 15
     refresh_token_expire_days: int = 7
 
-    payment_retry_max_attempts: int = 3
-    payment_retry_delay_seconds: int = 2
-
-    google_client_id: str = ""
-    google_client_secret: str = ""
+    google_client_id: str | None = None
+    google_client_secret: str | None = None
     google_redirect_uri: str = "http://localhost:8000/auth/google/callback"
     frontend_url: str = "http://localhost:3000"
 
