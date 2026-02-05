@@ -28,6 +28,15 @@ services:
         value: "true"
       - key: AUTO_SEED
         value: "true"  # Set to "false" after initial deploy if you don't want re-seeding
+      # Google OAuth - Set values in Render dashboard
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
 
   # Next.js Frontend
   - type: web
