@@ -36,6 +36,7 @@ describe('AuthStore', () => {
       refreshToken: vi.fn(),
       getCurrentUser: vi.fn(),
       setAccessToken: vi.fn(),
+      googleCallback: vi.fn(),
     } as unknown as ApiClient;
 
     store = createAuthStore();
@@ -254,6 +255,44 @@ describe('AuthStore', () => {
       });
 
       expect(mockApiClient.refreshToken).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('loginWithGoogle', () => {
+    it('should login with google successfully and set user', async () => {
+      (mockApiClient.googleCallback as any).mockResolvedValue(mockToken);
+      (mockApiClient.getCurrentUser as any).mockResolvedValue(mockUser);
+
+      await act(async () => {
+        await store.getState().loginWithGoogle(mockApiClient, 'auth-code', 'state-123');
+      });
+
+      const state = store.getState();
+
+      expect(mockApiClient.googleCallback).toHaveBeenCalledWith('auth-code', 'state-123');
+      expect(mockApiClient.setAccessToken).toHaveBeenCalledWith(mockToken.access_token);
+      expect(mockApiClient.getCurrentUser).toHaveBeenCalled();
+      expect(state.user).toEqual(mockUser);
+      expect(state.accessToken).toBe(mockToken.access_token);
+      expect(state.refreshToken).toBe(mockToken.refresh_token);
+      expect(state.isLoading).toBe(false);
+    });
+
+    it('should handle google login error', async () => {
+      (mockApiClient.googleCallback as any).mockRejectedValue(
+        new Error('Invalid code')
+      );
+
+      await expect(
+        act(async () => {
+          await store.getState().loginWithGoogle(mockApiClient, 'invalid-code', 'state-123');
+        })
+      ).rejects.toThrow('Invalid code');
+
+      const state = store.getState();
+
+      expect(state.user).toBeNull();
+      expect(state.isLoading).toBe(false);
     });
   });
 

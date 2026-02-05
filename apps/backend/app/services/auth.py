@@ -37,7 +37,13 @@ class AuthService:
 
     async def login(self, credentials: UserLogin) -> Token:
         user = await self.user_repo.get_by_email(credentials.email)
-        if not user or not verify_password(credentials.password, user.hashed_password):
+        if not user:
+            raise UnauthorizedException("Invalid email or password")
+        
+        if user.hashed_password is None:
+            raise UnauthorizedException("User uses OAuth authentication only")
+
+        if not verify_password(credentials.password, user.hashed_password):
             raise UnauthorizedException("Invalid email or password")
 
         if not user.is_active:
@@ -88,4 +94,41 @@ class AuthService:
         if not user.is_active:
             raise UnauthorizedException("User account is disabled")
 
+        return user
+
+    async def get_or_create_oauth_user(self, email: str, name: str, google_id: str) -> User:
+        user_by_google_id = await self.user_repo.get_by_google_id(google_id)
+        if user_by_google_id:
+            return user_by_google_id
+
+        user_by_email = await self.user_repo.get_by_email(email)
+        if user_by_email:
+            if user_by_email.google_id is None:
+                user_by_email.google_id = google_id
+                await self.db.commit()
+                await self.db.refresh(user_by_email)
+                return user_by_email
+            else:
+                raise ConflictException("Email already associated with different Google account")
+
+        user_dict = {
+            "email": email,
+            "full_name": name,
+            "google_id": google_id,
+            "hashed_password": None,
+            "role": UserRole.USER,
+        }
+        return await self.user_repo.create(user_dict)
+
+    async def link_google_account(self, user: User, google_id: str) -> User:
+        existing_user = await self.user_repo.get_by_google_id(google_id)
+        if existing_user and existing_user.id != user.id:
+            raise ConflictException("Google account already linked to another user")
+
+        if user.google_id:
+            raise ConflictException("User already has a linked Google account")
+
+        user.google_id = google_id
+        await self.db.commit()
+        await self.db.refresh(user)
         return user

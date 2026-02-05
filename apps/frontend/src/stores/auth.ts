@@ -16,6 +16,16 @@ export interface AuthStoreState {
     email: string,
     password: string,
   ) => Promise<void>;
+  loginWithGoogle: (
+    api: ApiClient,
+    code: string,
+    state: string,
+  ) => Promise<void>;
+  loginWithTokens: (
+    api: ApiClient,
+    accessToken: string,
+    refreshToken: string,
+  ) => Promise<void>;
   register: (
     api: ApiClient,
     email: string,
@@ -52,6 +62,49 @@ export const createAuthStore = () => {
                 user,
                 accessToken: tokens.access_token,
                 refreshToken: tokens.refresh_token,
+                isLoading: false,
+              });
+            } catch (error) {
+              set({ isLoading: false });
+              throw error;
+            }
+          },
+
+          loginWithGoogle: async (
+            api: ApiClient,
+            code: string,
+            state: string,
+          ) => {
+            set({ isLoading: true });
+            try {
+              const tokens = await api.googleCallback(code, state);
+              api.setAccessToken(tokens.access_token);
+              const user = await api.getCurrentUser();
+              set({
+                user,
+                accessToken: tokens.access_token,
+                refreshToken: tokens.refresh_token,
+                isLoading: false,
+              });
+            } catch (error) {
+              set({ isLoading: false });
+              throw error;
+            }
+          },
+
+          loginWithTokens: async (
+            api: ApiClient,
+            accessToken: string,
+            refreshToken: string,
+          ) => {
+            set({ isLoading: true });
+            try {
+              api.setAccessToken(accessToken);
+              const user = await api.getCurrentUser();
+              set({
+                user,
+                accessToken,
+                refreshToken,
                 isLoading: false,
               });
             } catch (error) {

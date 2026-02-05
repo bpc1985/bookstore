@@ -363,6 +363,16 @@ export class ApiClient {
   async getAnalytics(): Promise<Analytics> {
     return this.request<Analytics>("/admin/analytics");
   }
+
+  async getGoogleAuthUrl(): Promise<{ authorization_url: string }> {
+    return this.request<{ authorization_url: string }>("/auth/google");
+  }
+
+  async googleCallback(code: string, state: string): Promise<Token> {
+    return this.request<Token>(
+      `/auth/google/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`
+    );
+  }
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';

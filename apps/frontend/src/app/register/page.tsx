@@ -12,6 +12,7 @@ import { registerSchema } from '@/lib/schemas';
 import { useRegisterMutation } from '@/lib/hooks';
 import { toast } from 'sonner';
 import AuthGuard from '@/components/middleware/AuthGuard';
+import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -149,6 +150,15 @@ export default function RegisterPage() {
                 {registerMutation.isPending ? 'Creating account...' : 'Create account'}
               </Button>
             </form>
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+              </div>
+            </div>
+            <GoogleSignInButton variant="signup" />
             <div className="mt-6 text-center text-sm">
               <span className="text-muted-foreground">Already have an account? </span>
               <Link href="/login" className="text-primary hover:underline">

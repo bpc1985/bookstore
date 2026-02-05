@@ -13,6 +13,10 @@ class UserRepository(BaseRepository[User]):
         result = await self.db.execute(select(User).where(User.email == email))
         return result.scalar_one_or_none()
 
+    async def get_by_google_id(self, google_id: str) -> User | None:
+        result = await self.db.execute(select(User).where(User.google_id == google_id))
+        return result.scalar_one_or_none()
+
     async def blacklist_token(self, token: str) -> None:
         blacklisted = TokenBlacklist(token=token)
         self.db.add(blacklisted)

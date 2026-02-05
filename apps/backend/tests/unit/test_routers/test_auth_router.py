@@ -184,3 +184,48 @@ class TestAuthRouter:
         assert response.status_code == 422
         data = response.json()
         assert "full_name" in str(data)
+
+    async def test_google_auth_not_configured(self, client, monkeypatch):
+        def mock_not_configured():
+            return False
+        
+        monkeypatch.setattr(
+            "app.services.oauth.OAuthService.is_oauth_configured",
+            lambda self: False
+        )
+        
+        response = await client.get("/auth/google")
+        assert response.status_code == 503
+        data = response.json()
+        assert "not configured" in data["detail"].lower()
+        response = await client.get("/auth/google")
+        assert response.status_code == 503
+        data = response.json()
+        assert "not configured" in data["detail"].lower()
+
+    async def test_oauth_only_user_cannot_login_with_password(self, client, db_session):
+        from app.models.user import User
+        
+        # Create OAuth-only user
+        user = User(
+            email="oauthuser@test.com",
+            full_name="OAuth User",
+            hashed_password=None,
+            google_id="google_123",
+            role="user"
+        )
+        db_session.add(user)
+        await db_session.commit()
+        await db_session.refresh(user)
+        
+        # Try to login with password
+        response = await client.post(
+            "/auth/login",
+            json={
+                "email": "oauthuser@test.com",
+                "password": "password123"
+            }
+        )
+        assert response.status_code == 401
+        data = response.json()
+        assert "OAuth authentication only" in data["detail"]

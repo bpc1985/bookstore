@@ -48,3 +48,17 @@ class TokenPayload(BaseModel):
     sub: int
     exp: datetime
     type: str
+
+
+class GoogleAuthResponse(BaseModel):
+    authorization_url: str
+
+
+class GoogleCallbackRequest(BaseModel):
+    code: str
+    state: str
+
+
+class GoogleLinkResponse(BaseModel):
+    success: bool
+    message: str

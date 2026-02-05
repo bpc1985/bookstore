@@ -1114,6 +1114,49 @@ describe('ApiClient', () => {
     });
   });
 
+  describe('google oauth', () => {
+    it('should get google auth url', async () => {
+      const mockResponse = {
+        authorization_url: 'https://accounts.google.com/oauth/authorize?client_id=123',
+      };
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      } as Response);
+
+      const result = await apiClient.getGoogleAuthUrl();
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        'http://test-api.com/auth/google',
+        expect.objectContaining({ headers: expect.any(Object) })
+      );
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('should exchange google callback code for tokens', async () => {
+      const mockToken: Token = {
+        access_token: 'access-token',
+        refresh_token: 'refresh-token',
+        token_type: 'bearer',
+        expires_in: 900,
+      };
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockToken,
+      } as Response);
+
+      const result = await apiClient.googleCallback('auth-code', 'state-123');
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        'http://test-api.com/auth/google/callback?code=auth-code&state=state-123',
+        expect.objectContaining({ headers: expect.any(Object) })
+      );
+      expect(result).toEqual(mockToken);
+    });
+  });
+
   describe('payments', () => {
     it('should initiate payment', async () => {
       const mockPayment = {
