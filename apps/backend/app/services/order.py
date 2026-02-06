@@ -101,10 +101,12 @@ class OrderService:
         for order in orders:
             order_list.append({
                 "id": order.id,
+                "user_id": order.user_id,
                 "status": order.status,
                 "total_amount": order.total_amount,
                 "created_at": order.created_at,
-                "item_count": sum(item.quantity for item in order.items)
+                "item_count": sum(item.quantity for item in order.items),
+                "user_email": order.user.email if order.user else None
             })
 
         return PaginatedResponse.create(items=order_list, total=total, page=page, size=size)

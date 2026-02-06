@@ -25,7 +25,7 @@ Full-stack e-commerce bookstore application using **Turborepo** monorepo with pn
 - 📦 Order management with status tracking
 - ⭐ Book reviews with verified purchase badges
 - 👤 User authentication with JWT (access + refresh tokens)
-- 🔐 Admin panel for inventory, orders, and reviews
+- 🔐 Admin dashboard for books, categories, orders, reviews, and users
 
 ## Tech Stack
 
@@ -45,8 +45,9 @@ Full-stack e-commerce bookstore application using **Turborepo** monorepo with pn
 ```
 bookstore/
 ├── apps/
-│   ├── frontend/          # Next.js 16 — http://localhost:3000
-│   └── backend/           # FastAPI + SQLAlchemy — http://localhost:8000
+│   ├── frontend/          # Next.js 16 — http://localhost:3000 (customer)
+│   ├── admin/             # Next.js 16 — http://localhost:3002 (admin)
+│   └── backend           # FastAPI + SQLAlchemy — http://localhost:8000
 ├── packages/
 │   └── types/             # @bookstore/types — shared TypeScript types
 └── package.json
@@ -76,6 +77,7 @@ pnpm dev                     # Starts all apps
 
 ```bash
 pnpm frontend:dev            # Next.js at http://localhost:3000
+pnpm admin:dev               # Next.js at http://localhost:3002
 pnpm backend:dev             # FastAPI at http://localhost:8000 (requires venv)
 ```
 
@@ -111,8 +113,20 @@ pnpm backend:migrate         # Run Alembic migrations
 
 | Command | Description |
 |---------|-------------|
-| `pnpm frontend:dev` | Start Next.js frontend |
+| `pnpm frontend:dev` | Start Next.js frontend (customer) |
 | `pnpm frontend:build` | Build Next.js frontend |
+
+### Admin Commands
+
+| Command | Description |
+|---------|-------------|
+| `pnpm admin:dev` | Start Next.js admin dashboard |
+| `pnpm admin:build` | Build Next.js admin |
+| `pnpm admin:lint` | Lint admin code |
+| `pnpm admin:typecheck` | Type check admin TypeScript |
+| `pnpm admin:test` | Run admin tests (Vitest) |
+| `pnpm admin:test:ui` | Run admin tests with Vitest UI |
+| `pnpm admin:test:coverage` | Run admin tests with coverage |
 
 ### Backend Commands
 
@@ -136,7 +150,13 @@ pnpm backend:migrate         # Run Alembic migrations
 
 ## Environment Variables
 
-### Frontend
+### Frontend (Customer)
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `NEXT_PUBLIC_API_URL` | `http://localhost:8000` | Backend API base URL |
+
+### Admin
 
 | Variable | Default | Description |
 |----------|---------|-------------|

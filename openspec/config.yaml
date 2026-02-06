@@ -8,28 +8,32 @@ context: |
   ## Project Overview
   Full-stack e-commerce bookstore monorepo:
   - Frontend: Next.js 16 with shadcn/ui and Zustand (apps/frontend/)
+  - Admin: Next.js 16 with shadcn/ui and Zustand (apps/admin/)
   - Backend: FastAPI with async SQLAlchemy (apps/backend/)
   - Shared Types: TypeScript interfaces (packages/types/)
 
   ## Tech Stack
   - Frontend: TypeScript, React 19, Next.js 16, Tailwind CSS, shadcn/ui, Zustand
+  - Admin: TypeScript, React 19, Next.js 16, Tailwind CSS, shadcn/ui, Zustand
   - Backend: Python 3.11+, FastAPI, SQLAlchemy (async), SQLite, Alembic
   - Monorepo: Turborepo, pnpm workspaces
 
-  ## Naming Convention for Changes
-  Use prefixes to indicate scope:
+   ## Naming Convention for Changes
+   Use prefixes to indicate scope:
 
-  | Prefix | Scope | Example |
-  |--------|-------|---------|
-  | (none) | Cross-app (frontend + backend) | `add-payment-gateway` |
-  | `fe-`  | Frontend only | `fe-add-book-filters` |
-  | `be-`  | Backend only | `be-optimize-book-query` |
+   | Prefix | Scope | Example |
+   |--------|-------|---------|
+   | (none) | Cross-app (frontend + backend) | `add-payment-gateway` |
+   | `ad-`  | Admin app only | `ad-add-user-management` |
+   | `fe-`  | Frontend (customer) only | `fe-add-book-filters` |
+   | `be-`  | Backend only | `be-optimize-book-query` |
 
-  **Guidelines:**
-  - Use `fe-` prefix for changes that ONLY touch `apps/frontend/` or `packages/types/`
-  - Use `be-` prefix for changes that ONLY touch `apps/backend/`
-  - Use NO prefix for changes that span both frontend and backend
-  - Always use kebab-case for change names
+   **Guidelines:**
+   - Use `ad-` prefix for changes that ONLY touch `apps/admin/` or admin-specific packages
+   - Use `fe-` prefix for changes that ONLY touch `apps/frontend/` (customer-facing)
+   - Use `be-` prefix for changes that ONLY touch `apps/backend/`
+   - Use NO prefix for changes that span multiple apps
+   - Always use kebab-case for change names
 
   ## Testing
   - Frontend: Vitest with React Testing Library
@@ -44,11 +48,11 @@ context: |
 # Rules for specific artifacts
 rules:
   proposal:
-    - Clearly state whether this is frontend-only (fe-), backend-only (be-), or cross-app
+    - Clearly state whether this is admin-only (ad-), frontend-only (fe-), backend-only (be-), or cross-app
     - Reference relevant existing code paths
   design:
     - Follow existing patterns in the codebase
     - Consider type sharing through @bookstore/types for cross-app changes
   tasks:
-    - Group tasks by app (frontend/backend) for cross-app changes
+    - Group tasks by app (admin/frontend/backend) for cross-app changes
     - Include test tasks for each implementation task

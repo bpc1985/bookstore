@@ -56,6 +56,25 @@
     },
     "clean": {
       "cache": false
+    },
+    "@bookstore/admin#dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "@bookstore/admin#build": {
+      "dependsOn": ["@bookstore/types#build"],
+      "outputs": [".next/**", "!.next/cache/**"]
+    },
+    "@bookstore/admin#lint": {
+      "outputs": []
+    },
+    "@bookstore/admin#typecheck": {
+      "dependsOn": ["@bookstore/admin#build"],
+      "outputs": []
+    },
+    "@bookstore/admin#test": {
+      "dependsOn": ["@bookstore/admin#build"],
+      "outputs": ["coverage/**"]
     }
   }
 }

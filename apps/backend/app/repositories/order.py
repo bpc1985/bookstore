@@ -16,7 +16,8 @@ class OrderRepository(BaseRepository[Order]):
             select(Order)
             .options(
                 selectinload(Order.items).selectinload(OrderItem.book),
-                selectinload(Order.status_history)
+                selectinload(Order.status_history),
+                selectinload(Order.user)
             )
             .where(Order.id == order_id)
         )
@@ -60,7 +61,7 @@ class OrderRepository(BaseRepository[Order]):
         offset: int = 0,
         limit: int = 20
     ) -> tuple[Sequence[Order], int]:
-        query = select(Order).options(selectinload(Order.items))
+        query = select(Order).options(selectinload(Order.items), selectinload(Order.user))
         count_query = select(func.count(Order.id))
 
         if status:

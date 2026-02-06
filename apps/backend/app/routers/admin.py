@@ -1,16 +1,18 @@
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.models.user import User
+from app.models.user import User, UserRole
 from app.models.order import Order, OrderStatus
 from app.models.book import Book
 from app.models.review import Review
 from app.schemas.order import OrderDetailResponse, OrderListResponse, OrderStatusUpdate
 from app.schemas.review import ReviewResponse
+from app.schemas.user import UserResponse
 from app.services.order import OrderService
 from app.services.review import ReviewService
+from app.repositories.user import UserRepository
 from app.dependencies import get_admin_user
 from app.utils.pagination import PaginatedResponse
 from pydantic import BaseModel
@@ -27,6 +29,14 @@ class AnalyticsResponse(BaseModel):
     total_books: int
     total_users: int
     total_reviews: int
+
+
+class RoleUpdate(BaseModel):
+    role: str
+
+
+class StatusUpdate(BaseModel):
+    is_active: bool
 
 
 @router.get("/orders", response_model=PaginatedResponse[OrderListResponse])
@@ -74,6 +84,7 @@ async def get_order_admin(
         "updated_at": order.updated_at,
         "items": items_response,
         "status_history": order.status_history,
+        "user_email": order.user.email if order.user else None,
     }
 
 
@@ -152,3 +163,94 @@ async def get_analytics(
         total_users=total_users,
         total_reviews=total_reviews,
     )
+
+
+# ===== User Management =====
+
+
+@router.get("/users", response_model=PaginatedResponse[UserResponse])
+async def list_users(
+    role: str | None = Query(None, description="Filter by role"),
+    is_active: bool | None = Query(None, description="Filter by active status"),
+    page: int = Query(1, ge=1),
+    size: int = Query(20, ge=1, le=100),
+    admin: User = Depends(get_admin_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """List all users (Admin only)."""
+    query = select(User)
+    count_query = select(func.count(User.id))
+
+    if role is not None:
+        query = query.where(User.role == role)
+        count_query = count_query.where(User.role == role)
+    if is_active is not None:
+        query = query.where(User.is_active == is_active)
+        count_query = count_query.where(User.is_active == is_active)
+
+    total_result = await db.execute(count_query)
+    total = total_result.scalar_one()
+
+    offset = (page - 1) * size
+    query = query.order_by(User.created_at.desc()).offset(offset).limit(size)
+    result = await db.execute(query)
+    users = result.scalars().all()
+
+    return PaginatedResponse.create(items=users, total=total, page=page, size=size)
+
+
+@router.get("/users/{user_id}", response_model=UserResponse)
+async def get_user(
+    user_id: int,
+    admin: User = Depends(get_admin_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Get user details (Admin only)."""
+    user_repo = UserRepository(db)
+    user = await user_repo.get(user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+
+@router.put("/users/{user_id}/role", response_model=UserResponse)
+async def update_user_role(
+    user_id: int,
+    role_update: RoleUpdate,
+    admin: User = Depends(get_admin_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Update a user's role (Admin only)."""
+    user_repo = UserRepository(db)
+    user = await user_repo.get(user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user.id == admin.id:
+        raise HTTPException(status_code=400, detail="Cannot change your own role")
+
+    try:
+        new_role = UserRole(role_update.role)
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"Invalid role: {role_update.role}")
+
+    user = await user_repo.update(user, {"role": new_role})
+    return user
+
+
+@router.put("/users/{user_id}/status", response_model=UserResponse)
+async def update_user_status(
+    user_id: int,
+    status_update: StatusUpdate,
+    admin: User = Depends(get_admin_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Activate or deactivate a user (Admin only)."""
+    user_repo = UserRepository(db)
+    user = await user_repo.get(user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user.id == admin.id:
+        raise HTTPException(status_code=400, detail="Cannot change your own status")
+
+    user = await user_repo.update(user, {"is_active": status_update.is_active})
+    return user

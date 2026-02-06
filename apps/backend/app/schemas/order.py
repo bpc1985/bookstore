@@ -48,6 +48,7 @@ class OrderResponse(BaseModel):
 
 class OrderDetailResponse(OrderResponse):
     status_history: list[OrderStatusHistoryResponse] = []
+    user_email: str | None = None
 
     class Config:
         from_attributes = True
@@ -55,10 +56,12 @@ class OrderDetailResponse(OrderResponse):
 
 class OrderListResponse(BaseModel):
     id: int
+    user_id: int
     status: OrderStatus
     total_amount: Decimal
     created_at: datetime
     item_count: int
+    user_email: str | None = None
 
     class Config:
         from_attributes = True

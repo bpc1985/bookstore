@@ -52,6 +52,9 @@ export class ApiClient {
     });
 
     if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error("Unauthorized - please login again");
+      }
       const error = await response
         .json()
         .catch(() => ({ detail: "An error occurred" }));
@@ -65,28 +68,10 @@ export class ApiClient {
     return response.json();
   }
 
-  async register(data: {
-    email: string;
-    password: string;
-    full_name: string;
-  }): Promise<User> {
-    return this.request<User>("/auth/register", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
-  }
-
   async login(data: { email: string; password: string }): Promise<Token> {
     return this.request<Token>("/auth/login", {
       method: "POST",
       body: JSON.stringify(data),
-    });
-  }
-
-  async refreshToken(refreshToken: string): Promise<Token> {
-    return this.request<Token>("/auth/refresh", {
-      method: "POST",
-      body: JSON.stringify({ refresh_token: refreshToken }),
     });
   }
 
@@ -103,19 +88,7 @@ export class ApiClient {
     return this.request<User>("/users/me");
   }
 
-  async updateProfile(data: {
-    full_name?: string;
-    password?: string;
-  }): Promise<User> {
-    return this.request<User>("/users/me", {
-      method: "PUT",
-      body: JSON.stringify(data),
-    });
-  }
-
-  async getCategories(): Promise<Category[]> {
-    return this.request<Category[]>("/categories");
-  }
+  // ===== Books CRUD =====
 
   async getBooks(params?: {
     search?: string;
@@ -175,38 +148,73 @@ export class ApiClient {
     return this.request<void>(`/books/${id}`, { method: "DELETE" });
   }
 
-  async getCart(): Promise<Cart> {
-    return this.request<Cart>("/cart");
+  async getBookReviews(
+    bookId: number,
+    page = 1,
+    size = 20,
+  ): Promise<PaginatedResponse<Review>> {
+    return this.request<PaginatedResponse<Review>>(
+      `/books/${bookId}/reviews?page=${page}&size=${size}`,
+    );
   }
 
-  async addToCart(bookId: number, quantity = 1): Promise<CartItem> {
-    return this.request<CartItem>("/cart/items", {
+  async createReview(
+    bookId: number,
+    data: { rating: number; comment?: string },
+  ): Promise<Review> {
+    return this.request<Review>(`/books/${bookId}/reviews`, {
       method: "POST",
-      body: JSON.stringify({ book_id: bookId, quantity }),
+      body: JSON.stringify(data),
     });
   }
 
-  async updateCartItem(itemId: number, quantity: number): Promise<CartItem> {
-    return this.request<CartItem>(`/cart/items/${itemId}`, {
+  async updateReview(
+    reviewId: number,
+    data: { rating?: number; comment?: string },
+  ): Promise<Review> {
+    return this.request<Review>(`/reviews/${reviewId}`, {
       method: "PUT",
-      body: JSON.stringify({ quantity }),
+      body: JSON.stringify(data),
     });
   }
 
-  async removeCartItem(itemId: number): Promise<void> {
-    return this.request<void>(`/cart/items/${itemId}`, { method: "DELETE" });
+  async deleteReview(reviewId: number): Promise<void> {
+    return this.request<void>(`/reviews/${reviewId}`, { method: "DELETE" });
   }
 
-  async clearCart(): Promise<void> {
-    return this.request<void>("/cart", { method: "DELETE" });
+  // ===== Categories CRUD =====
+
+  async getCategories(): Promise<Category[]> {
+    return this.request<Category[]>("/categories");
   }
 
-  async createOrder(shippingAddress: string): Promise<Order> {
-    return this.request<Order>("/orders", {
+  async createCategory(data: {
+    name: string;
+    parent_id?: number | null;
+  }): Promise<Category> {
+    return this.request<Category>("/categories", {
       method: "POST",
-      body: JSON.stringify({ shipping_address: shippingAddress }),
+      body: JSON.stringify(data),
     });
   }
+
+  async updateCategory(
+    id: number,
+    data: { name: string; parent_id?: number | null },
+  ): Promise<Category> {
+    return this.request<Category>(`/categories/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteCategory(id: number): Promise<void> {
+    return this.request<void>(`/categories/${id}`, {
+      method: "DELETE",
+    });
+  }
+
+  // ===== Orders =====
 
   async getOrders(params?: {
     status?: string;
@@ -239,6 +247,48 @@ export class ApiClient {
     return this.request<OrderTracking>(`/orders/${id}/tracking`);
   }
 
+  // ===== Cart =====
+
+  async getCart(): Promise<Cart> {
+    return this.request<Cart>("/cart");
+  }
+
+  async addToCart(bookId: number, quantity = 1): Promise<CartItem> {
+    return this.request<CartItem>("/cart/items", {
+      method: "POST",
+      body: JSON.stringify({ book_id: bookId, quantity }),
+    });
+  }
+
+  async updateCartItem(itemId: number, quantity: number): Promise<CartItem> {
+    return this.request<CartItem>(`/cart/items/${itemId}`, {
+      method: "PUT",
+      body: JSON.stringify({ quantity }),
+    });
+  }
+
+  async removeCartItem(itemId: number): Promise<void> {
+    return this.request<void>(`/cart/items/${itemId}`, { method: "DELETE" });
+  }
+
+  async clearCart(): Promise<void> {
+    return this.request<void>("/cart", { method: "DELETE" });
+  }
+
+  // ===== Reviews =====
+
+  async getBookReviews(
+    bookId: number,
+    page = 1,
+    size = 20,
+  ): Promise<PaginatedResponse<Review>> {
+    return this.request<PaginatedResponse<Review>>(
+      `/books/${bookId}/reviews?page=${page}&size=${size}`,
+    );
+  }
+
+  // ===== Payments =====
+
   async initiatePayment(
     orderId: number,
     provider: "stripe" | "paypal",
@@ -251,7 +301,14 @@ export class ApiClient {
     message: string;
   }> {
     const idempotencyKey = `${orderId}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    return this.request("/payments/checkout", {
+    return this.request<{
+      payment_id: number;
+      status: string;
+      client_secret?: string;
+      approval_url?: string;
+      redirect_url: string | null;
+      message: string;
+    }>("/payments/checkout", {
       method: "POST",
       body: JSON.stringify({
         order_id: orderId,
@@ -292,77 +349,7 @@ export class ApiClient {
     });
   }
 
-  async getBookReviews(
-    bookId: number,
-    page = 1,
-    size = 20,
-  ): Promise<PaginatedResponse<Review>> {
-    return this.request<PaginatedResponse<Review>>(
-      `/books/${bookId}/reviews?page=${page}&size=${size}`,
-    );
-  }
-
-  async createReview(
-    bookId: number,
-    data: { rating: number; comment?: string },
-  ): Promise<Review> {
-    return this.request<Review>(`/books/${bookId}/reviews`, {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
-  }
-
-  async updateReview(
-    reviewId: number,
-    data: { rating?: number; comment?: string },
-  ): Promise<Review> {
-    return this.request<Review>(`/reviews/${reviewId}`, {
-      method: "PUT",
-      body: JSON.stringify(data),
-    });
-  }
-
-  async deleteReview(reviewId: number): Promise<void> {
-    return this.request<void>(`/reviews/${reviewId}`, { method: "DELETE" });
-  }
-
-  async getAdminOrders(params?: {
-    status?: string;
-    page?: number;
-    size?: number;
-  }): Promise<PaginatedResponse<OrderListItem>> {
-    const searchParams = new URLSearchParams();
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          searchParams.append(key, String(value));
-        }
-      });
-    }
-    const query = searchParams.toString();
-    return this.request<PaginatedResponse<OrderListItem>>(
-      `/admin/orders${query ? `?${query}` : ""}`,
-    );
-  }
-
-  async getAdminOrder(id: number): Promise<Order> {
-    return this.request<Order>(`/admin/orders/${id}`);
-  }
-
-  async updateOrderStatus(
-    id: number,
-    status: string,
-    note?: string,
-  ): Promise<Order> {
-    return this.request<Order>(`/admin/orders/${id}/status`, {
-      method: "PUT",
-      body: JSON.stringify({ status, note }),
-    });
-  }
-
-  async getAnalytics(): Promise<Analytics> {
-    return this.request<Analytics>("/admin/analytics");
-  }
+  // ===== Google Auth =====
 
   async getGoogleAuthUrl(): Promise<{ authorization_url: string }> {
     return this.request<{ authorization_url: string }>("/auth/google");
@@ -375,6 +362,6 @@ export class ApiClient {
   }
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export const api = new ApiClient({ baseUrl: API_URL });

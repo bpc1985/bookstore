@@ -33,6 +33,8 @@ class ReviewResponse(ReviewBase):
     created_at: datetime
     updated_at: datetime
     reviewer: ReviewerInfo | None = None
+    book_title: str | None = None
+    user_name: str | None = None
 
     class Config:
         from_attributes = True

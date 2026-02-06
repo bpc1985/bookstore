@@ -10,6 +10,23 @@ from app.exceptions import NotFoundException, ConflictException, ForbiddenExcept
 from app.utils.pagination import PaginatedResponse
 
 
+SENSITIVE_KEYWORDS = [
+    "spam", "scam", "fake", "hate", "racist", "sexist",
+    "stupid", "idiot", "moron", "dumb", "dump", "suck", "crap",
+    "trash", "garbage", "worthless", "awful", "terrible", "horrible",
+    "damn", "hell", "ass", "shit", "fuck", "bitch", "wtf",
+    "kill", "die", "threat", "violence",
+    "http://", "https://", "www.", ".com", ".net",
+]
+
+
+def contains_sensitive_content(text: str | None) -> bool:
+    if not text:
+        return False
+    lower = text.lower()
+    return any(keyword in lower for keyword in SENSITIVE_KEYWORDS)
+
+
 class ReviewService:
     def __init__(self, db: AsyncSession):
         self.db = db
@@ -50,7 +67,7 @@ class ReviewService:
             rating=review_data.rating,
             comment=review_data.comment,
             is_verified_purchase=is_verified,
-            is_approved=True
+            is_approved=not contains_sensitive_content(review_data.comment)
         )
         self.db.add(review)
         await self.db.commit()
@@ -111,6 +128,8 @@ class ReviewService:
             review.rating = review_data.rating
         if review_data.comment is not None:
             review.comment = review_data.comment
+            if contains_sensitive_content(review_data.comment):
+                review.is_approved = False
 
         await self.db.commit()
         await self.db.refresh(review)
@@ -155,4 +174,21 @@ class ReviewService:
     async def get_pending_reviews(self, page: int = 1, size: int = 20) -> PaginatedResponse:
         offset = (page - 1) * size
         reviews, total = await self.review_repo.get_pending_reviews(offset, size)
-        return PaginatedResponse.create(items=list(reviews), total=total, page=page, size=size)
+
+        review_list = []
+        for review in reviews:
+            review_list.append({
+                "id": review.id,
+                "rating": review.rating,
+                "comment": review.comment,
+                "is_verified_purchase": review.is_verified_purchase,
+                "is_approved": review.is_approved,
+                "created_at": review.created_at,
+                "updated_at": review.updated_at,
+                "user_id": review.user_id,
+                "book_id": review.book_id,
+                "book_title": review.book.title if review.book else "Unknown",
+                "user_name": review.user.full_name if review.user else "Anonymous",
+            })
+
+        return PaginatedResponse.create(items=review_list, total=total, page=page, size=size)
