@@ -26,6 +26,9 @@ ENV DOCKER_BUILD=true
 # Build the admin app
 RUN pnpm --filter @bookstore/admin build
 
+# Ensure public directory exists (may be empty)
+RUN mkdir -p /app/apps/admin/public
+
 # Production image
 FROM node:20-alpine AS runner
 WORKDIR /app

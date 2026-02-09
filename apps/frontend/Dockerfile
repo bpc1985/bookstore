@@ -10,6 +10,8 @@ FROM base AS builder
 # Copy all workspace files needed for install
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/types ./packages/types
+COPY packages/ui ./packages/ui
+COPY packages/lib ./packages/lib
 COPY apps/frontend ./apps/frontend
 
 # Install dependencies
