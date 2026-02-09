@@ -5,8 +5,8 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/stores/auth";
 import { AdminSidebar } from "./admin-sidebar";
 import { AdminHeader } from "./admin-header";
-import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
+import { Skeleton } from "@bookstore/ui";
+import { cn } from "@bookstore/lib";
 
 const SIDEBAR_STORAGE_KEY = "admin-sidebar-collapsed";
 

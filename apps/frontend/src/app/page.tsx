@@ -16,10 +16,10 @@ import {
   Compass,
   GraduationCap,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@bookstore/ui";
+import { Card, CardContent } from "@bookstore/ui";
+import { Skeleton } from "@bookstore/ui";
+import { Badge } from "@bookstore/ui";
 import { api } from "@/lib/api";
 import type { BookListItem, Category } from "@bookstore/types";
 import { useAuthStore } from "@/stores/auth";

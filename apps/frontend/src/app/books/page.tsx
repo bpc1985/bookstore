@@ -5,18 +5,18 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { BookOpen, Filter, Search, Star, X, SlidersHorizontal } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@bookstore/ui';
+import { Card, CardContent } from '@bookstore/ui';
+import { Input } from '@bookstore/ui';
+import { Skeleton } from '@bookstore/ui';
+import { Badge } from '@bookstore/ui';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@bookstore/ui';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { api } from '@/lib/api';
 import type { BookListItem, Category, PaginatedResponse } from '@/types';

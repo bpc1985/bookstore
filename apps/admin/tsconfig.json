@@ -20,7 +20,9 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@bookstore/types": ["../../packages/types/src"]
+      "@bookstore/types": ["../../packages/types/src"],
+      "@bookstore/ui": ["../../packages/ui/src"],
+      "@bookstore/lib": ["../../packages/lib/src"]
     }
   },
   "include": [

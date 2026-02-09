@@ -1,17 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
+import { Button } from "@bookstore/ui";
+import { Input } from "@bookstore/ui";
+import { Label } from "@bookstore/ui";
+import { Card } from "@bookstore/ui";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@bookstore/ui";
 import {
   Table,
   TableBody,
@@ -19,8 +19,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Skeleton } from "@/components/ui/skeleton";
+} from "@bookstore/ui";
+import { Skeleton } from "@bookstore/ui";
 import { Search, Star, Check, X, MessageSquare } from "lucide-react";
 import { api } from "@/lib/api";
 import type { Review as BaseReview } from "@bookstore/types";
@@ -30,7 +30,7 @@ interface Review extends BaseReview {
   user_name?: string;
 }
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@bookstore/ui";
 
 export default function ReviewsModerationPage() {
   const [reviews, setReviews] = useState<Review[]>([]);

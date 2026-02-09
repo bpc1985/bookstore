@@ -3,17 +3,17 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@bookstore/ui";
+import { Input } from "@bookstore/ui";
+import { Label } from "@bookstore/ui";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@bookstore/ui";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@bookstore/ui";
 import { ArrowLeft, Save } from "lucide-react";
 import { api } from "@/lib/api";
 import type { Category as BaseCategory } from "@bookstore/types";

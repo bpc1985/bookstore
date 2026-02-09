@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { DollarSign, Package, BookOpen, Users, TrendingUp, Star, ArrowUpRight } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardHeader, CardTitle } from "@bookstore/ui";
+import { Skeleton } from "@bookstore/ui";
 import { api } from "@/lib/api";
 import type { Analytics } from "@bookstore/types";
 import Link from "next/link";

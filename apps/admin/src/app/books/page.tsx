@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
+import { Button } from "@bookstore/ui";
+import { Input } from "@bookstore/ui";
+import { Card } from "@bookstore/ui";
 import {
   Table,
   TableBody,
@@ -12,16 +12,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+} from "@bookstore/ui";
+import { Badge } from "@bookstore/ui";
+import { Skeleton } from "@bookstore/ui";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@bookstore/ui";
 import { Search, Plus, Edit, Trash2, BookOpen } from "lucide-react";
 import { api } from "@/lib/api";
 import type { BookListItem as BaseBookListItem, Category, PaginatedResponse } from "@bookstore/types";
@@ -30,7 +30,7 @@ interface BookListItem extends BaseBookListItem {
   is_deleted?: boolean;
 }
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@bookstore/ui";
 
 export default function BooksListPage() {
   const [books, setBooks] = useState<BookListItem[]>([]);

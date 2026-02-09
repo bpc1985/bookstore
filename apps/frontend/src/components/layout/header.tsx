@@ -11,16 +11,16 @@ import {
   Menu,
   Search,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@bookstore/ui";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@bookstore/ui";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@bookstore/ui";
 import { useAuthStore } from "@/stores/auth";
 import { useCartStore } from "@/stores/cart";
 import { api } from "@/lib/api";

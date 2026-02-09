@@ -5,19 +5,19 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { User, Mail, Calendar, Package, Star, ShieldCheck } from "lucide-react";
 import { useForm } from '@tanstack/react-form';
-import { Button } from "@/components/ui/button";
+import { Button } from "@bookstore/ui";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
+} from "@bookstore/ui";
+import { Input } from "@bookstore/ui";
+import { Label } from "@bookstore/ui";
+import { Badge } from "@bookstore/ui";
+import { Separator } from "@bookstore/ui";
+import { Skeleton } from "@bookstore/ui";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuthStore } from "@/stores/auth";
 import { api } from "@/lib/api";

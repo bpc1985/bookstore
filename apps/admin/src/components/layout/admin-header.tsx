@@ -1,7 +1,7 @@
 "use client";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@bookstore/ui";
+import { Button } from "@bookstore/ui";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +9,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@bookstore/ui";
 import { Bell, LogOut } from "lucide-react";
 import { useAuthStore } from "@/stores/auth";
 import { api } from "@/lib/api";

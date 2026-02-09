@@ -73,7 +73,6 @@
       "outputs": []
     },
     "@bookstore/admin#test": {
-      "dependsOn": ["@bookstore/admin#build"],
       "outputs": ["coverage/**"]
     }
   }

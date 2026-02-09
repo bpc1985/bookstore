@@ -2,16 +2,16 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
+import { Button } from "@bookstore/ui";
+import { Input } from "@bookstore/ui";
+import { Card } from "@bookstore/ui";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@bookstore/ui";
 import {
   Table,
   TableBody,
@@ -19,9 +19,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+} from "@bookstore/ui";
+import { Badge } from "@bookstore/ui";
+import { Skeleton } from "@bookstore/ui";
 import { Search, ShoppingCart, Eye } from "lucide-react";
 import { api } from "@/lib/api";
 import type { OrderListItem as BaseOrderListItem } from "@bookstore/types";

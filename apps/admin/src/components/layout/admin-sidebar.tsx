@@ -12,9 +12,9 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { cn } from "@bookstore/lib";
+import { Button } from "@bookstore/ui";
+import { Separator } from "@bookstore/ui";
 import {
   Tooltip,
   TooltipContent,

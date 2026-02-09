@@ -52,6 +52,20 @@ services:
       - key: NEXT_PUBLIC_API_URL
         sync: false # Manually set in Render dashboard
 
+  # Next.js Admin
+  - type: web
+    name: bookstore-admin
+    runtime: docker
+    region: frankfurt
+    plan: free
+    dockerfilePath: ./apps/admin/Dockerfile
+    dockerContext: . # Build from monorepo root for workspace deps
+    envVars:
+      # Set this after first deploy: https://bookstore-api.onrender.com
+      # Or use your custom domain for the API
+      - key: NEXT_PUBLIC_API_URL
+        sync: false # Manually set in Render dashboard
+
 databases:
   - name: bookstore-db
     region: frankfurt # Same region as services

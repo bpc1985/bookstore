@@ -75,6 +75,17 @@ export class ApiClient {
     });
   }
 
+  async register(data: {
+    email: string;
+    password: string;
+    full_name: string;
+  }): Promise<User> {
+    return this.request<User>("/auth/register", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
   async logout(refreshToken?: string): Promise<void> {
     return this.request<void>("/auth/logout", {
       method: "POST",
@@ -84,8 +95,22 @@ export class ApiClient {
     });
   }
 
+  async refreshToken(refreshToken: string): Promise<Token> {
+    return this.request<Token>("/auth/refresh", {
+      method: "POST",
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    });
+  }
+
   async getCurrentUser(): Promise<User> {
     return this.request<User>("/users/me");
+  }
+
+  async updateProfile(data: { full_name?: string }): Promise<User> {
+    return this.request<User>("/users/me", {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
   }
 
   // ===== Books CRUD =====
@@ -216,6 +241,13 @@ export class ApiClient {
 
   // ===== Orders =====
 
+  async createOrder(shippingAddress: string): Promise<Order> {
+    return this.request<Order>("/orders", {
+      method: "POST",
+      body: JSON.stringify({ shipping_address: shippingAddress }),
+    });
+  }
+
   async getOrders(params?: {
     status?: string;
     page?: number;
@@ -275,16 +307,48 @@ export class ApiClient {
     return this.request<void>("/cart", { method: "DELETE" });
   }
 
-  // ===== Reviews =====
+  // ===== Admin =====
 
-  async getBookReviews(
-    bookId: number,
-    page = 1,
-    size = 20,
-  ): Promise<PaginatedResponse<Review>> {
-    return this.request<PaginatedResponse<Review>>(
-      `/books/${bookId}/reviews?page=${page}&size=${size}`,
+  async getAnalytics(): Promise<Analytics> {
+    return this.request<Analytics>("/admin/analytics");
+  }
+
+  async getAdminOrders(params?: {
+    status?: string;
+    page?: number;
+    size?: number;
+  }): Promise<PaginatedResponse<OrderListItem>> {
+    const searchParams = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          searchParams.append(key, String(value));
+        }
+      });
+    }
+    const query = searchParams.toString();
+    return this.request<PaginatedResponse<OrderListItem>>(
+      `/admin/orders${query ? `?${query}` : ""}`,
     );
+  }
+
+  async getAdminOrder(id: number): Promise<Order> {
+    return this.request<Order>(`/admin/orders/${id}`);
+  }
+
+  async updateOrderStatus(
+    orderId: number,
+    status: string,
+    note?: string,
+  ): Promise<Order> {
+    const body: Record<string, string> = { status };
+    if (note) {
+      body.note = note;
+    }
+    return this.request<Order>(`/admin/orders/${orderId}/status`, {
+      method: "PUT",
+      body: JSON.stringify(body),
+    });
   }
 
   // ===== Payments =====

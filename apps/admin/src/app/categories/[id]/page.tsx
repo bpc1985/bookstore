@@ -2,9 +2,9 @@
 
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@bookstore/ui";
+import { Card, CardContent, CardHeader, CardTitle } from "@bookstore/ui";
+import { Skeleton } from "@bookstore/ui";
 import { ArrowLeft, Edit, Trash2, FolderTree } from "lucide-react";
 import { api } from "@/lib/api";
 import type { Category as BaseCategory, BookListItem } from "@bookstore/types";
@@ -13,7 +13,7 @@ interface Category extends BaseCategory {
   parent_id?: number | null;
 }
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@bookstore/ui";
 
 export default function CategoryDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);

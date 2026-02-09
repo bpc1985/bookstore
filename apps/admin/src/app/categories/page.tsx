@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Button } from "@bookstore/ui";
+import { Card } from "@bookstore/ui";
 import {
   Table,
   TableBody,
@@ -11,8 +11,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Skeleton } from "@/components/ui/skeleton";
+} from "@bookstore/ui";
+import { Skeleton } from "@bookstore/ui";
 import { Plus, Edit, Trash2, FolderTree } from "lucide-react";
 import { api } from "@/lib/api";
 import type { Category as BaseCategory } from "@bookstore/types";
@@ -23,7 +23,7 @@ interface Category extends BaseCategory {
   book_count?: number;
 }
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@bookstore/ui";
 
 export default function CategoriesListPage() {
   const [categories, setCategories] = useState<Category[]>([]);

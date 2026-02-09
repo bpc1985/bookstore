@@ -3,17 +3,17 @@
 import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@bookstore/ui";
+import { Card, CardContent, CardHeader, CardTitle } from "@bookstore/ui";
+import { Badge } from "@bookstore/ui";
+import { Skeleton } from "@bookstore/ui";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@bookstore/ui";
 import { ArrowLeft, Shield, Check, Ban, Mail, Calendar } from "lucide-react";
 import { api } from "@/lib/api";
 import type { User, OrderListItem as BaseOrderListItem } from "@bookstore/types";
@@ -22,7 +22,7 @@ interface OrderListItem extends BaseOrderListItem {
   user_id?: number;
 }
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@bookstore/ui";
 import { useAuthStore } from "@/stores/auth";
 
 export default function UserDetailPage({ params }: { params: Promise<{ id: string }> }) {

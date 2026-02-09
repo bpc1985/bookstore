@@ -13,6 +13,9 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "@bookstore/lib": path.resolve(__dirname, "../../packages/lib/src"),
+      "@bookstore/ui": path.resolve(__dirname, "../../packages/ui/src"),
+      "@bookstore/types": path.resolve(__dirname, "../../packages/types/src"),
     },
   },
 });

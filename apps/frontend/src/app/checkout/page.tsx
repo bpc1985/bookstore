@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, CheckCircle2, Loader2 } from "lucide-react";
 import { useForm } from "@tanstack/react-form";
-import { Button } from "@/components/ui/button";
+import { Button } from "@bookstore/ui";
 import {
   Card,
   CardContent,
@@ -13,12 +13,12 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Textarea } from "@/components/ui/textarea";
+} from "@bookstore/ui";
+import { Input } from "@bookstore/ui";
+import { Label } from "@bookstore/ui";
+import { Separator } from "@bookstore/ui";
+import { Skeleton } from "@bookstore/ui";
+import { Textarea } from "@bookstore/ui";
 import { useAuthStore } from "@/stores/auth";
 import { useCartStore } from "@/stores/cart";
 import { api } from "@/lib/api";

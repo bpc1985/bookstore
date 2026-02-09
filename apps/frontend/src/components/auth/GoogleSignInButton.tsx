@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@bookstore/ui';
 import { api } from '@/lib/api';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
